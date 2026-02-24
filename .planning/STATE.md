@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 1 of 4 (Foundation)
-Plan: 0 of 3 in current phase
-Status: Ready to plan
-Last activity: 2026-02-23 — Roadmap created, ready to begin Phase 1 planning
+Plan: 1 of 3 in current phase
+Status: Executing
+Last activity: 2026-02-23 — Completed 01-01-PLAN.md (project scaffolding, config, logging, state)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [███░░░░░░░] 10%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: —
-- Total execution time: —
+- Total plans completed: 1
+- Average duration: 4min
+- Total execution time: 4min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 1. Foundation | 1/3 | 4min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: —
-- Trend: —
+- Last 5 plans: 01-01 (4min)
+- Trend: Starting
 
 *Updated after each plan completion*
 
@@ -46,6 +46,9 @@ Recent decisions affecting current work:
 - [Init]: Season-level Sonarr search (SeasonSearch) confirmed — avoids indexer hammering
 - [Init]: JSON file with atomic write chosen for state store (simpler than SQLite for cursor + bounded log)
 - [Init]: API keys in X-Api-Key header only — never query params, never in any response body
+- [01-01]: Settings loads via init_settings + TomlConfigSettingsSource for testability with arbitrary TOML paths
+- [01-01]: Config loader reads TOML via tomllib and passes parsed data as init kwargs for path flexibility
+- [01-01]: Default config uses plain text template to preserve inline comments
 
 ### Pending Todos
 
@@ -59,5 +62,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Roadmap created, REQUIREMENTS.md traceability updated
+Stopped at: Completed 01-01-PLAN.md
 Resume file: None

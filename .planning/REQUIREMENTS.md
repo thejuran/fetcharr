@@ -9,8 +9,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Connections
 
-- [ ] **CONN-01**: User can configure Radarr connection via URL + API key, validated on startup
-- [ ] **CONN-02**: User can configure Sonarr connection via URL + API key, validated on startup
+- [x] **CONN-01**: User can configure Radarr connection via URL + API key, validated on startup
+- [x] **CONN-02**: User can configure Sonarr connection via URL + API key, validated on startup
 
 ### Search Engine
 
@@ -44,7 +44,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Security
 
-- [ ] **SECR-01**: API keys are stored server-side only and never returned by any HTTP endpoint
+- [x] **SECR-01**: API keys are stored server-side only and never returned by any HTTP endpoint
 
 ### Deployment
 
@@ -87,9 +87,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CONN-01 | Phase 1 | Pending |
-| CONN-02 | Phase 1 | Pending |
-| SECR-01 | Phase 1 | Pending |
+| CONN-01 | Phase 1 | Complete |
+| CONN-02 | Phase 1 | Complete |
+| SECR-01 | Phase 1 | Complete |
 | SRCH-01 | Phase 2 | Pending |
 | SRCH-02 | Phase 2 | Pending |
 | SRCH-03 | Phase 2 | Pending |

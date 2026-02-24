@@ -29,7 +29,7 @@ Requirements for Ship & Document release. Each maps to roadmap phases.
 ### Search Features
 
 - [x] **SRCH-12**: User can set a hard max items per cycle that overrides per-app counts
-- [ ] **SRCH-13**: Search history persisted to SQLite (survives container restart, queryable)
+- [x] **SRCH-13**: Search history persisted to SQLite (survives container restart, queryable)
 
 ## v2 Requirements
 
@@ -70,7 +70,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RELS-02 | Phase 10 | Complete |
 | RELS-03 | Phase 10 | Complete |
 | SRCH-12 | Phase 11 | Complete |
-| SRCH-13 | Phase 11 | Pending |
+| SRCH-13 | Phase 11 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 12 total

@@ -264,6 +264,37 @@ def test_search_now_happy_path(client, test_app):
         assert "Radarr" in response.text  # Card partial contains app name
 
 
+# ---------------------------------------------------------------------------
+# WEBU-09 / WEBU-11: Position labels and outcome badge
+# ---------------------------------------------------------------------------
+
+
+def test_dashboard_shows_position_x_of_y(client):
+    """Dashboard app card shows position in 'X of Y' format (WEBU-09)."""
+    response = client.get("/")
+    assert response.status_code == 200
+    # Radarr mock state: missing_cursor=3, missing_count=42
+    assert "3 of 42" in response.text, "Missing position should show 'X of Y' format"
+    # Radarr mock state: cutoff_cursor=1, cutoff_count=7
+    assert "1 of 7" in response.text, "Cutoff position should show 'X of Y' format"
+
+
+async def test_search_log_shows_outcome_badge(test_app, tmp_path):
+    """Search log partial shows outcome badge for entries (WEBU-11)."""
+    # Insert a failed search entry
+    db_path = test_app.state.db_path
+    await insert_search_entry(
+        db_path, "Radarr", "missing", "Failed Movie",
+        outcome="failed", detail="Connection refused",
+    )
+
+    with TestClient(test_app) as tc:
+        response = tc.get("/partials/search-log")
+    assert response.status_code == 200
+    assert "failed" in response.text, "Search log should show failed outcome badge"
+    assert "bg-red-500/20" in response.text, "Failed outcome should use red styling"
+
+
 def test_dashboard_shows_log_viewer_section(client):
     """GET / response contains the Application Log section heading."""
     # Add a sample log entry so the viewer has content

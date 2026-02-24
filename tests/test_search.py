@@ -618,3 +618,64 @@ async def test_radarr_cycle_counts_skipped_on_search_failure(tmp_path):
     assert "3 fetched" in output
     assert "2 searched" in output
     assert "1 skipped" in output
+
+
+# ---------------------------------------------------------------------------
+# Outcome logging in DB (failed searches)
+# ---------------------------------------------------------------------------
+
+
+async def test_radarr_cycle_logs_failed_search_to_db(tmp_path):
+    """Radarr cycle records failed searches in DB with outcome and detail."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    client = AsyncMock()
+    client.get_wanted_missing = AsyncMock(
+        return_value=[
+            {"id": 1, "title": "Movie Fail", "monitored": True},
+        ]
+    )
+    client.get_wanted_cutoff = AsyncMock(return_value=[])
+    client.search_movies = AsyncMock(side_effect=Exception("API timeout"))
+
+    state = _default_state()
+    settings = _cycle_settings(missing_count=2, cutoff_count=2)
+
+    await run_radarr_cycle(client, state, settings, db_path)
+
+    from fetcharr.db import get_recent_searches
+
+    searches = await get_recent_searches(db_path)
+    assert len(searches) == 1
+    assert searches[0]["name"] == "Movie Fail"
+    assert searches[0]["outcome"] == "failed"
+    assert "API timeout" in searches[0]["detail"]
+
+
+async def test_sonarr_cycle_logs_failed_search_to_db(tmp_path):
+    """Sonarr cycle records failed searches in DB with outcome and detail."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    episodes = [
+        _make_sonarr_episode(series_id=10, season_number=1, series_title="Show Fail", episode_id=100),
+    ]
+
+    client = AsyncMock()
+    client.get_wanted_missing = AsyncMock(return_value=episodes)
+    client.get_wanted_cutoff = AsyncMock(return_value=[])
+    client.search_season = AsyncMock(side_effect=Exception("Connection refused"))
+
+    state = _default_state()
+    settings = _cycle_settings(missing_count=2, cutoff_count=2)
+
+    await run_sonarr_cycle(client, state, settings, db_path)
+
+    from fetcharr.db import get_recent_searches
+
+    searches = await get_recent_searches(db_path)
+    assert len(searches) == 1
+    assert "Show Fail" in searches[0]["name"]
+    assert searches[0]["outcome"] == "failed"
+    assert "Connection refused" in searches[0]["detail"]

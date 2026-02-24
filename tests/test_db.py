@@ -117,3 +117,55 @@ async def test_get_recent_searches_empty_db(tmp_path):
 
     results = await get_recent_searches(db_path)
     assert results == []
+
+
+# ---------------------------------------------------------------------------
+# Outcome / detail column tests
+# ---------------------------------------------------------------------------
+
+
+async def test_insert_with_outcome_and_detail(tmp_path):
+    """Insert an entry with explicit outcome and detail, verify retrieval."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    await insert_search_entry(
+        db_path, "Radarr", "missing", "Movie X",
+        outcome="failed", detail="Connection refused",
+    )
+
+    results = await get_recent_searches(db_path)
+    assert len(results) == 1
+    assert results[0]["outcome"] == "failed"
+    assert results[0]["detail"] == "Connection refused"
+
+
+async def test_insert_default_outcome(tmp_path):
+    """Insert without specifying outcome/detail uses defaults."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    await insert_search_entry(db_path, "Radarr", "missing", "Movie Y")
+
+    results = await get_recent_searches(db_path)
+    assert len(results) == 1
+    assert results[0]["outcome"] == "searched"
+    assert results[0]["detail"] == ""
+
+
+async def test_migration_preserves_existing_rows(tmp_path):
+    """Calling init_db twice (re-migration) preserves existing rows."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    # Insert an entry before second init_db call
+    await insert_search_entry(db_path, "Sonarr", "cutoff", "Show Z")
+
+    # Second init_db triggers migration again (columns already exist)
+    await init_db(db_path)
+
+    results = await get_recent_searches(db_path)
+    assert len(results) == 1
+    assert results[0]["name"] == "Show Z"
+    # Entry inserted after migration has outcome populated
+    assert results[0]["outcome"] == "searched"

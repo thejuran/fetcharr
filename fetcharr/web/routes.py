@@ -20,8 +20,11 @@ from loguru import logger
 from fetcharr.clients.radarr import RadarrClient
 from fetcharr.clients.sonarr import SonarrClient
 from fetcharr.config import load_settings
+from fetcharr.logging import setup_logging
+from fetcharr.models.config import Settings as SettingsModel
 from fetcharr.search.engine import run_radarr_cycle, run_sonarr_cycle
 from fetcharr.search.scheduler import make_search_job
+from fetcharr.startup import collect_secrets
 from fetcharr.state import save_state
 from fetcharr.web.validation import safe_int, safe_log_level, validate_arr_url
 
@@ -154,11 +157,21 @@ async def save_settings(request: Request) -> RedirectResponse:
             "search_cutoff_count": safe_int(form.get(f"{name}_search_cutoff_count"), 5, 1, 100),
         }
 
-    # Write TOML and reload settings
+    # Validate BEFORE writing to disk (QUAL-02)
+    try:
+        new_settings = SettingsModel(**new_config)
+    except Exception:
+        logger.warning("Invalid settings rejected -- config file unchanged")
+        return RedirectResponse(url="/settings", status_code=303)
+
+    # Config is valid -- write to disk
     config_path.write_text(tomli_w.dumps(new_config))
     os.chmod(config_path, 0o600)
-    new_settings = load_settings(config_path)
     request.app.state.settings = new_settings
+
+    # Refresh log redaction with new secrets (QUAL-05)
+    secrets = collect_secrets(new_settings)
+    setup_logging(new_settings.general.log_level, secrets)
 
     # Handle scheduler updates for each app
     for name in ("radarr", "sonarr"):
@@ -235,23 +248,24 @@ async def search_now(request: Request, app_name: str) -> HTMLResponse:
         return HTMLResponse("App not enabled", status_code=400)
 
     cycle_fn = run_radarr_cycle if app_name == "radarr" else run_sonarr_cycle
-    try:
-        request.app.state.fetcharr_state = await cycle_fn(
-            client,
-            request.app.state.fetcharr_state,
-            request.app.state.settings,
-        )
-        save_state(
-            request.app.state.fetcharr_state,
-            request.app.state.state_path,
-        )
-        logger.info("{name}: Manual search triggered", name=app_name.title())
-    except Exception as exc:
-        logger.error(
-            "{name}: Manual search failed -- {exc}",
-            name=app_name.title(),
-            exc=exc,
-        )
+    async with request.app.state.search_lock:
+        try:
+            request.app.state.fetcharr_state = await cycle_fn(
+                client,
+                request.app.state.fetcharr_state,
+                request.app.state.settings,
+            )
+            save_state(
+                request.app.state.fetcharr_state,
+                request.app.state.state_path,
+            )
+            logger.info("{name}: Manual search triggered", name=app_name.title())
+        except Exception as exc:
+            logger.error(
+                "{name}: Manual search failed -- {exc}",
+                name=app_name.title(),
+                exc=exc,
+            )
 
     # Return updated card partial
     app_data = _build_app_context(request, app_name)

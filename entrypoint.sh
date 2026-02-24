@@ -33,4 +33,4 @@ chown -R "$PUID:$PGID" /config
 # Drop privileges and exec into Fetcharr.
 # exec replaces this shell so python becomes PID 1 and receives SIGTERM
 # from `docker stop` directly.
-exec setpriv --reuid="$PUID" --regid="$PGID" --init-groups python -m fetcharr
+exec setpriv --reuid="$PUID" --regid="$PGID" --init-groups --no-new-privileges python -m fetcharr

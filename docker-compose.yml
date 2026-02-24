@@ -12,7 +12,15 @@ services:
     volumes:
       - fetcharr_config:/config
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+    security_opt:
+      - no-new-privileges:true
     restart: unless-stopped
 
 volumes:

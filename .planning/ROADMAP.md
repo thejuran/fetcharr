@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Search Engine** - Scheduler, round-robin, and cycle logic — the core product
 - [x] **Phase 3: Web UI** - Status dashboard and config editor backed by real state data
 - [x] **Phase 4: Docker** - Multi-stage packaging and release-ready artifact
-- [ ] **Phase 5: Security Hardening** - CSRF, SSRF, input validation, Docker hardening, and CDN removal
+- [x] **Phase 5: Security Hardening** - CSRF, SSRF, input validation, Docker hardening, and CDN removal (completed 2026-02-24)
 - [ ] **Phase 6: Bug Fixes & Resilience** - Race conditions, error handling, state recovery, and log redaction
 - [ ] **Phase 7: Test Coverage** - Async path tests for clients, cycles, scheduler, and startup
 
@@ -99,7 +99,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Search Engine | 3/3 | Complete | 2026-02-24 |
 | 3. Web UI | 3/3 | Complete | 2026-02-24 |
 | 4. Docker | 1/1 | Complete | 2026-02-24 |
-| 5. Security Hardening | 1/2 | In Progress | — |
+| 5. Security Hardening | 1/2 | Complete    | 2026-02-24 |
 | 6. Bug Fixes & Resilience | 0/? | Not Started | — |
 | 7. Test Coverage | 0/? | Not Started | — |
 
@@ -115,7 +115,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
   5. docker-compose.yml binds port to 127.0.0.1 only, container drops all capabilities, and entrypoint sets no-new-privileges
   6. Config TOML file is written with 0o600 permissions (owner read/write only)
   7. htmx is bundled as a local static file — no external CDN or unpinned script tag
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 05-01-PLAN.md — Origin/Referer CSRF middleware, Docker least-privilege hardening, htmx vendoring

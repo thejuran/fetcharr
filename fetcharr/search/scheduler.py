@@ -9,6 +9,7 @@ capturing variables, enabling future hot-reload of clients and settings.
 
 from __future__ import annotations
 
+import asyncio
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
@@ -49,19 +50,20 @@ def make_search_job(
         client = getattr(app.state, f"{app_name}_client", None)
         if client is None:
             return
-        try:
-            app.state.fetcharr_state = await cycle_fn(
-                client,
-                app.state.fetcharr_state,
-                app.state.settings,
-            )
-            save_state(app.state.fetcharr_state, state_path)
-        except Exception as exc:
-            logger.error(
-                "{app}: Unhandled error in search cycle -- {exc}",
-                app=app_name.title(),
-                exc=exc,
-            )
+        async with app.state.search_lock:
+            try:
+                app.state.fetcharr_state = await cycle_fn(
+                    client,
+                    app.state.fetcharr_state,
+                    app.state.settings,
+                )
+                save_state(app.state.fetcharr_state, state_path)
+            except Exception as exc:
+                logger.error(
+                    "{app}: Unhandled error in search cycle -- {exc}",
+                    app=app_name.title(),
+                    exc=exc,
+                )
 
     return job
 
@@ -114,6 +116,7 @@ def create_lifespan(
         app.state.sonarr_client = sonarr_client
         app.state.config_path = config_path
         app.state.state_path = state_path
+        app.state.search_lock = asyncio.Lock()
 
         # --- Schedule jobs for enabled apps using make_search_job ---
         for name in ("radarr", "sonarr"):

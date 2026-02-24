@@ -11,7 +11,7 @@ Requirements for v1.2 Polish & Harden. Each maps to roadmap phases.
 
 - [x] **SRCH-15**: Fetcharr detects Sonarr v3 vs v4 API version at startup and logs it
 - [x] **SRCH-16**: Fetcharr logs total item count fetched per cycle so users can diagnose pageSize truncation
-- [ ] **SRCH-17**: Sonarr episode-by-episode fallback triggers automatically when SeasonSearch fails
+- [x] ~~**SRCH-17**: Sonarr episode-by-episode fallback triggers automatically when SeasonSearch fails~~ — **Dropped**: Sonarr's SeasonSearch already queries for both season packs and individual episodes natively
 
 ### Dashboard & UI
 
@@ -60,15 +60,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SRCH-14 | Phase 15 | Complete |
 | SRCH-15 | Phase 13 | Complete |
 | SRCH-16 | Phase 13 | Complete |
-| SRCH-17 | Phase 16 | Pending |
+| SRCH-17 | ~~Phase 16~~ | Dropped (native Sonarr behavior) |
 | WEBU-09 | Phase 14 | Complete |
 | WEBU-10 | Phase 14 | Complete |
 | WEBU-11 | Phase 14 | Complete |
 | CICD-04 | Phase 13 | Complete |
 
 **Coverage:**
-- v1.2 requirements: 8 total
-- Mapped to phases: 8
+- v1.2 requirements: 8 total (1 dropped)
+- Mapped to phases: 7
+- Dropped: 1 (SRCH-17 — native Sonarr behavior)
 - Unmapped: 0
 
 ---

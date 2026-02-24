@@ -8,7 +8,7 @@ Fetcharr is a single-process automation daemon that cycles through Radarr and So
 
 - v1.0 MVP -- Phases 1-8 (shipped 2026-02-24) -- [archive](milestones/v1.0-ROADMAP.md)
 - v1.1 Ship & Document -- Phases 9-12 (shipped 2026-02-24) -- [archive](milestones/v1.1-ROADMAP.md)
-- **v1.2 Polish & Harden** -- Phases 13-16 (in progress)
+- **v1.2 Polish & Harden** -- Phases 13-15 (in progress)
 
 ## Phases
 
@@ -43,7 +43,6 @@ Fetcharr is a single-process automation daemon that cycles through Radarr and So
 - [x] **Phase 13: CI & Search Diagnostics** - Push CI to GitHub and add backend search diagnostic logging (completed 2026-02-24)
 - [x] **Phase 14: Dashboard Observability** - Enhance dashboard with position progress, app logs, and search detail (completed 2026-02-24)
 - [x] **Phase 15: Search History UI** - Browsable search history with filtering and pagination (completed 2026-02-24)
-- [ ] **Phase 16: Sonarr Episode Fallback** - Automatic episode-level retry when season search fails
 
 ## Phase Details
 
@@ -89,23 +88,11 @@ Plans:
 - [ ] 15-01-PLAN.md -- Backend query with filtering/pagination, history page template, nav link, htmx partial
 - [ ] 15-02-PLAN.md -- Tests for search history query, route, and template rendering
 
-### Phase 16: Sonarr Episode Fallback
-**Goal**: Sonarr searches recover automatically when season-level search fails by retrying at episode granularity
-**Depends on**: Phase 13
-**Requirements**: SRCH-17
-**Success Criteria** (what must be TRUE):
-  1. When a Sonarr SeasonSearch command fails or returns an error, Fetcharr automatically retries with individual EpisodeSearch commands for that season's episodes
-  2. Episode fallback events are logged so users can see when and why fallback was triggered
-  3. The fallback does not re-search episodes that are already downloaded
-**Plans**: TBD
-
-Plans:
-- [ ] 16-01: TBD
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 13 -> 14 -> 15 -> 16
+Phases execute in numeric order: 13 -> 14 -> 15
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -124,4 +111,3 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16
 | 13. CI & Search Diagnostics | 2/2 | Complete    | 2026-02-24 | - |
 | 14. Dashboard Observability | 2/2 | Complete    | 2026-02-24 | - |
 | 15. Search History UI | 2/2 | Complete    | 2026-02-24 | - |
-| 16. Sonarr Episode Fallback | v1.2 | 0/TBD | Not started | - |

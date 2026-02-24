@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible media on a schedule, without exposing credentials or expanding attack surface.
-**Current focus:** Phase 14 - Dashboard Observability
+**Current focus:** Phase 15 - Search History UI
 
 ## Current Position
 
-Phase: 14 (second of 4 in v1.2) -- COMPLETE
-Plan: 2 of 2 in Phase 14 complete
-Status: Phase 14 complete, ready for Phase 15
-Last activity: 2026-02-24 -- Completed 14-01 (Position Labels & Search Outcomes)
+Phase: 15 (third of 4 in v1.2)
+Plan: 1 of 2 in Phase 15 complete
+Status: Executing Phase 15
+Last activity: 2026-02-24 -- Completed 15-01 (Search History Backend & UI)
 
-Progress: [████░░░░░░] 40%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
 **Overall:**
-- Total plans completed: 26 (v1.0: 18, v1.1: 5, v1.2: 3)
+- Total plans completed: 27 (v1.0: 18, v1.1: 5, v1.2: 4)
 - Milestones shipped: 2 (v1.0, v1.1)
-- v1.2 plans completed: 4
+- v1.2 plans completed: 5
 
 **By Phase:**
 
@@ -29,6 +29,7 @@ Progress: [████░░░░░░] 40%
 |-------|-------|-------|----------|
 | 13-ci-search-diagnostics | 2 | 6min | 3min |
 | 14-dashboard-observability | 2 | 6min | 3min |
+| 15-search-history-ui | 1 | 2min | 2min |
 
 *Updated after each plan completion*
 
@@ -47,6 +48,9 @@ Full decision log in PROJECT.md Key Decisions table.
 - [14-02] Closure-based buffer sink in setup_logging for secret redaction before buffer storage
 - [14-02] LogBuffer uses explicit Lock (not just deque atomic append) for thread-safe get_recent
 - [14-02] Buffer 200 entries; log viewer displays 30 newest-first
+- [15-01] COALESCE(outcome, 'searched') in SQL filter handles pre-migration NULL outcome rows
+- [15-01] Filter pills toggle via URL query param manipulation computed in Jinja2
+- [15-01] Text search uses 300ms debounce with hx-vals to carry current filter state
 
 ### Pending Todos
 
@@ -60,5 +64,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 14-01-PLAN.md (Position Labels & Search Outcomes) -- Phase 14 complete
+Stopped at: Completed 15-01-PLAN.md (Search History Backend & UI)
 Resume file: None

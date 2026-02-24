@@ -123,5 +123,5 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16
 | 12. Documentation | v1.1 | 1/1 | Complete | 2026-02-24 |
 | 13. CI & Search Diagnostics | 2/2 | Complete    | 2026-02-24 | - |
 | 14. Dashboard Observability | 2/2 | Complete    | 2026-02-24 | - |
-| 15. Search History UI | v1.2 | 0/2 | Not started | - |
+| 15. Search History UI | 1/2 | In Progress|  | - |
 | 16. Sonarr Episode Fallback | v1.2 | 0/TBD | Not started | - |

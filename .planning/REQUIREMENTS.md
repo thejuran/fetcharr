@@ -21,7 +21,7 @@ Requirements for v1.2 Polish & Harden. Each maps to roadmap phases.
 
 ### Search History
 
-- [ ] **SRCH-14**: User can browse search history with filtering by app/queue type and pagination
+- [x] **SRCH-14**: User can browse search history with filtering by app/queue type and pagination
 
 ### CI/CD
 
@@ -57,7 +57,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SRCH-14 | Phase 15 | Pending |
+| SRCH-14 | Phase 15 | Complete |
 | SRCH-15 | Phase 13 | Complete |
 | SRCH-16 | Phase 13 | Complete |
 | SRCH-17 | Phase 16 | Pending |

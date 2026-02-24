@@ -13,6 +13,8 @@ from collections.abc import Callable
 
 from loguru import logger
 
+from fetcharr.log_buffer import LogEntry, log_buffer
+
 
 def create_redacting_sink(secrets: list[str], stream=sys.stderr) -> Callable:
     """Create a loguru sink that redacts secrets from the full formatted output.
@@ -63,3 +65,19 @@ def setup_logging(level: str, secrets: list[str]) -> None:
         level=level.upper(),
         colorize=False,  # Custom sink function, not a stream -- no ANSI auto-detect
     )
+
+    # Buffer sink: captures log messages for the web UI log viewer.
+    # Secrets are redacted before storing in the buffer.
+    def buffer_sink(message) -> None:
+        text = message.record["message"]
+        for secret in secrets:
+            if secret:
+                text = text.replace(secret, "[REDACTED]")
+        entry = LogEntry(
+            timestamp=message.record["time"].strftime("%Y-%m-%d %H:%M:%S"),
+            level=message.record["level"].name,
+            message=text,
+        )
+        log_buffer.add(entry)
+
+    logger.add(buffer_sink, level=level.upper(), format="{message}")

@@ -14,15 +14,22 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.testclient import TestClient
 
+from fetcharr.db import init_db, insert_search_entry
 from fetcharr.web.routes import STATIC_DIR, router
 
 
 @pytest.fixture
-def test_app(tmp_path):
+async def test_app(tmp_path):
     """Build a minimal FastAPI app with mocked state for route testing."""
     app = FastAPI()
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
     app.include_router(router)
+
+    # Initialize SQLite search history database for tests
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+    await insert_search_entry(db_path, "Radarr", "missing", "Test Movie")
+    app.state.db_path = db_path
 
     # Mock fetcharr state
     app.state.fetcharr_state = {
@@ -44,14 +51,7 @@ def test_app(tmp_path):
             "missing_count": None,
             "cutoff_count": None,
         },
-        "search_log": [
-            {
-                "name": "Test Movie",
-                "timestamp": "2026-01-15T10:30:00Z",
-                "app": "Radarr",
-                "queue_type": "missing",
-            },
-        ],
+        "search_log": [],
     }
 
     # Mock settings with SecretStr-like api_key

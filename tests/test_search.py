@@ -1,11 +1,11 @@
 """Comprehensive tests for search engine utility functions and cycle orchestrators.
 
 Tests cover: filtering (monitored, air dates), batch slicing (normal,
-wrap, empty, past-end cursor), search log (add, format, eviction),
-deduplication (collapse, order, display name, fallback),
-Sonarr-specific filtering (unmonitored, future, null, past, malformed),
-and async cycle orchestration (happy path, network failure, per-item skip,
-cursor advancement) for both run_radarr_cycle and run_sonarr_cycle.
+wrap, empty, past-end cursor), deduplication (collapse, order, display
+name, fallback), Sonarr-specific filtering (unmonitored, future, null,
+past, malformed), and async cycle orchestration (happy path, network
+failure, per-item skip, cursor advancement) for both run_radarr_cycle
+and run_sonarr_cycle.
 """
 
 from __future__ import annotations
@@ -15,9 +15,8 @@ from unittest.mock import AsyncMock
 
 import httpx
 
+from fetcharr.db import init_db
 from fetcharr.search.engine import (
-    SEARCH_LOG_MAX,
-    append_search_log,
     cap_batch_sizes,
     deduplicate_to_seasons,
     filter_monitored,
@@ -88,41 +87,6 @@ def test_slice_batch_batch_larger_than_remaining():
     batch, new_cursor = slice_batch(items, cursor=1, batch_size=10)
     assert batch == [1, 2]
     assert new_cursor == 0
-
-
-# ---------------------------------------------------------------------------
-# append_search_log
-# ---------------------------------------------------------------------------
-
-
-def test_append_search_log_adds_entry():
-    state = _default_state()
-    append_search_log(state, "Radarr", "missing", "Test Movie")
-    assert len(state["search_log"]) == 1
-    entry = state["search_log"][0]
-    assert entry["name"] == "Test Movie"
-    assert entry["app"] == "Radarr"
-    assert entry["queue_type"] == "missing"
-    assert "timestamp" in entry
-
-
-def test_append_search_log_timestamp_format():
-    state = _default_state()
-    append_search_log(state, "Sonarr", "cutoff", "Test Show")
-    ts = state["search_log"][0]["timestamp"]
-    assert ts.endswith("Z")
-    # Verify it is valid ISO format
-    parsed = datetime.fromisoformat(ts.replace("Z", "+00:00"))
-    assert parsed.tzinfo is not None
-
-
-def test_append_search_log_bounded_at_50():
-    state = _default_state()
-    for i in range(55):
-        append_search_log(state, "Radarr", "missing", f"Movie {i}")
-    assert len(state["search_log"]) == SEARCH_LOG_MAX
-    # Oldest entries (0-4) should have been evicted; first entry is Movie 5
-    assert state["search_log"][0]["name"] == "Movie 5"
 
 
 # ---------------------------------------------------------------------------
@@ -229,7 +193,10 @@ def _cycle_settings(missing_count: int = 2, cutoff_count: int = 2):
     )
 
 
-async def test_run_radarr_cycle_happy_path():
+async def test_run_radarr_cycle_happy_path(tmp_path):
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
     client = AsyncMock()
     client.get_wanted_missing = AsyncMock(
         return_value=[
@@ -243,7 +210,7 @@ async def test_run_radarr_cycle_happy_path():
     state = _default_state()
     settings = _cycle_settings(missing_count=2, cutoff_count=2)
 
-    result = await run_radarr_cycle(client, state, settings)
+    result = await run_radarr_cycle(client, state, settings, db_path)
 
     # Both movies searched (batch_size=2 covers both)
     assert client.search_movies.call_count == 2
@@ -256,7 +223,10 @@ async def test_run_radarr_cycle_happy_path():
     assert result["radarr"]["missing_cursor"] == 0
 
 
-async def test_run_radarr_cycle_network_failure():
+async def test_run_radarr_cycle_network_failure(tmp_path):
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
     client = AsyncMock()
     client.get_wanted_missing = AsyncMock(
         side_effect=httpx.ConnectError("refused")
@@ -266,7 +236,7 @@ async def test_run_radarr_cycle_network_failure():
     state["radarr"]["missing_cursor"] = 5
     settings = _cycle_settings()
 
-    result = await run_radarr_cycle(client, state, settings)
+    result = await run_radarr_cycle(client, state, settings, db_path)
 
     assert result["radarr"]["connected"] is False
     assert result["radarr"]["unreachable_since"] is not None
@@ -274,7 +244,10 @@ async def test_run_radarr_cycle_network_failure():
     assert result["radarr"]["missing_cursor"] == 5
 
 
-async def test_run_radarr_cycle_per_item_skip():
+async def test_run_radarr_cycle_per_item_skip(tmp_path):
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
     client = AsyncMock()
     client.get_wanted_missing = AsyncMock(
         return_value=[
@@ -291,16 +264,22 @@ async def test_run_radarr_cycle_per_item_skip():
     state = _default_state()
     settings = _cycle_settings(missing_count=2, cutoff_count=2)
 
-    result = await run_radarr_cycle(client, state, settings)
+    await run_radarr_cycle(client, state, settings, db_path)
 
     # Did not abort after first failure -- called twice
     assert client.search_movies.call_count == 2
-    # Only the successful search was logged
-    assert len(result["search_log"]) == 1
-    assert result["search_log"][0]["name"] == "Movie B"
+    # Only the successful search was logged to SQLite
+    from fetcharr.db import get_recent_searches
+
+    searches = await get_recent_searches(db_path)
+    assert len(searches) == 1
+    assert searches[0]["name"] == "Movie B"
 
 
-async def test_run_radarr_cycle_cursor_advancement():
+async def test_run_radarr_cycle_cursor_advancement(tmp_path):
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
     movies = [
         {"id": i, "title": f"Movie {i}", "monitored": True}
         for i in range(1, 6)
@@ -317,7 +296,7 @@ async def test_run_radarr_cycle_cursor_advancement():
     state = _default_state()
     state["radarr"]["missing_cursor"] = 0
 
-    result = await run_radarr_cycle(client, state, settings)
+    result = await run_radarr_cycle(client, state, settings, db_path)
     assert result["radarr"]["missing_cursor"] == 2
 
     # --- Run 2: cursor 2 -> 4 ---
@@ -325,7 +304,7 @@ async def test_run_radarr_cycle_cursor_advancement():
     client.get_wanted_cutoff = AsyncMock(return_value=[])
     client.search_movies = AsyncMock()
 
-    result = await run_radarr_cycle(client, result, settings)
+    result = await run_radarr_cycle(client, result, settings, db_path)
     assert result["radarr"]["missing_cursor"] == 4
 
     # --- Run 3: cursor 4 -> wraps to 0 (only 1 item left, then wraps) ---
@@ -333,7 +312,7 @@ async def test_run_radarr_cycle_cursor_advancement():
     client.get_wanted_cutoff = AsyncMock(return_value=[])
     client.search_movies = AsyncMock()
 
-    result = await run_radarr_cycle(client, result, settings)
+    result = await run_radarr_cycle(client, result, settings, db_path)
     assert result["radarr"]["missing_cursor"] == 0
 
 
@@ -359,7 +338,10 @@ def _make_sonarr_episode(
     }
 
 
-async def test_run_sonarr_cycle_happy_path():
+async def test_run_sonarr_cycle_happy_path(tmp_path):
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
     episodes = [
         _make_sonarr_episode(series_id=10, season_number=1, series_title="Show A", episode_id=100),
         _make_sonarr_episode(series_id=10, season_number=2, series_title="Show A", episode_id=101),
@@ -373,7 +355,7 @@ async def test_run_sonarr_cycle_happy_path():
     state = _default_state()
     settings = _cycle_settings(missing_count=2, cutoff_count=2)
 
-    result = await run_sonarr_cycle(client, state, settings)
+    result = await run_sonarr_cycle(client, state, settings, db_path)
 
     # Two unique seasons from same series searched
     assert client.search_season.call_count == 2
@@ -383,7 +365,10 @@ async def test_run_sonarr_cycle_happy_path():
     assert result["sonarr"]["last_run"] is not None
 
 
-async def test_run_sonarr_cycle_network_failure():
+async def test_run_sonarr_cycle_network_failure(tmp_path):
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
     client = AsyncMock()
     client.get_wanted_missing = AsyncMock(
         side_effect=httpx.ConnectError("refused")
@@ -393,14 +378,17 @@ async def test_run_sonarr_cycle_network_failure():
     state["sonarr"]["missing_cursor"] = 3
     settings = _cycle_settings()
 
-    result = await run_sonarr_cycle(client, state, settings)
+    result = await run_sonarr_cycle(client, state, settings, db_path)
 
     assert result["sonarr"]["connected"] is False
     assert result["sonarr"]["unreachable_since"] is not None
     assert result["sonarr"]["missing_cursor"] == 3
 
 
-async def test_run_sonarr_cycle_per_item_skip():
+async def test_run_sonarr_cycle_per_item_skip(tmp_path):
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
     # Two episodes from different series -> 2 unique seasons after dedup
     episodes = [
         _make_sonarr_episode(series_id=10, season_number=1, series_title="Show A", episode_id=100),
@@ -418,15 +406,21 @@ async def test_run_sonarr_cycle_per_item_skip():
     state = _default_state()
     settings = _cycle_settings(missing_count=2, cutoff_count=2)
 
-    result = await run_sonarr_cycle(client, state, settings)
+    await run_sonarr_cycle(client, state, settings, db_path)
 
     assert client.search_season.call_count == 2
-    # Only the successful search was logged
-    assert len(result["search_log"]) == 1
-    assert "Show B" in result["search_log"][0]["name"]
+    # Only the successful search was logged to SQLite
+    from fetcharr.db import get_recent_searches
+
+    searches = await get_recent_searches(db_path)
+    assert len(searches) == 1
+    assert "Show B" in searches[0]["name"]
 
 
-async def test_run_sonarr_cycle_cursor_advancement():
+async def test_run_sonarr_cycle_cursor_advancement(tmp_path):
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
     # 4 episodes that deduplicate to 3 seasons
     episodes = [
         _make_sonarr_episode(series_id=10, season_number=1, series_title="Show A", episode_id=100),
@@ -446,7 +440,7 @@ async def test_run_sonarr_cycle_cursor_advancement():
     state = _default_state()
     state["sonarr"]["missing_cursor"] = 0
 
-    result = await run_sonarr_cycle(client, state, settings)
+    result = await run_sonarr_cycle(client, state, settings, db_path)
     assert result["sonarr"]["missing_cursor"] == 2
 
     # --- Run 2: cursor 2 -> wraps to 0 (only 1 season left) ---
@@ -454,7 +448,7 @@ async def test_run_sonarr_cycle_cursor_advancement():
     client.get_wanted_cutoff = AsyncMock(return_value=[])
     client.search_season = AsyncMock()
 
-    result = await run_sonarr_cycle(client, result, settings)
+    result = await run_sonarr_cycle(client, result, settings, db_path)
     assert result["sonarr"]["missing_cursor"] == 0
 
 

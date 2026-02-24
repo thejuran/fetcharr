@@ -13,6 +13,8 @@ import tempfile
 from pathlib import Path
 from typing import TypedDict
 
+from loguru import logger
+
 STATE_PATH = Path("/config/state.json")
 
 
@@ -45,6 +47,24 @@ def _default_state() -> FetcharrState:
     )
 
 
+def _merge_defaults(loaded: dict) -> FetcharrState:
+    """Merge loaded state over defaults so missing keys get default values.
+
+    Performs a shallow merge per app key. Only merges if the loaded value
+    is the correct type (dict for apps, list for search_log).
+    """
+    defaults = _default_state()
+
+    for app_key in ("radarr", "sonarr"):
+        if app_key in loaded and isinstance(loaded[app_key], dict):
+            defaults[app_key] = {**defaults[app_key], **loaded[app_key]}
+
+    if "search_log" in loaded and isinstance(loaded["search_log"], list):
+        defaults["search_log"] = loaded["search_log"]
+
+    return defaults
+
+
 def load_state(state_path: Path = STATE_PATH) -> FetcharrState:
     """Load state from a JSON file.
 
@@ -60,8 +80,14 @@ def load_state(state_path: Path = STATE_PATH) -> FetcharrState:
     if not state_path.exists():
         return _default_state()
 
-    with open(state_path) as f:
-        return json.load(f)
+    try:
+        with open(state_path) as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        logger.warning("Corrupt state file at {} -- resetting to defaults", state_path)
+        return _default_state()
+
+    return _merge_defaults(data)
 
 
 def save_state(state: FetcharrState, state_path: Path = STATE_PATH) -> None:
@@ -85,4 +111,11 @@ def save_state(state: FetcharrState, state_path: Path = STATE_PATH) -> None:
         tmp.flush()
         os.fsync(tmp.fileno())
 
-    os.replace(tmp.name, state_path)
+    try:
+        os.replace(tmp.name, state_path)
+    except OSError:
+        try:
+            os.unlink(tmp.name)
+        except OSError:
+            pass
+        raise

@@ -87,37 +87,37 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CONN-01 | — | Pending |
-| CONN-02 | — | Pending |
-| SRCH-01 | — | Pending |
-| SRCH-02 | — | Pending |
-| SRCH-03 | — | Pending |
-| SRCH-04 | — | Pending |
-| SRCH-05 | — | Pending |
-| SRCH-06 | — | Pending |
-| SRCH-07 | — | Pending |
-| SRCH-08 | — | Pending |
-| SRCH-09 | — | Pending |
-| SRCH-10 | — | Pending |
-| SRCH-11 | — | Pending |
-| CONF-01 | — | Pending |
-| CONF-02 | — | Pending |
-| WEBU-01 | — | Pending |
-| WEBU-02 | — | Pending |
-| WEBU-03 | — | Pending |
-| WEBU-04 | — | Pending |
-| WEBU-05 | — | Pending |
-| WEBU-06 | — | Pending |
-| WEBU-07 | — | Pending |
-| WEBU-08 | — | Pending |
-| SECR-01 | — | Pending |
-| DEPL-01 | — | Pending |
+| CONN-01 | Phase 1 | Pending |
+| CONN-02 | Phase 1 | Pending |
+| SECR-01 | Phase 1 | Pending |
+| SRCH-01 | Phase 2 | Pending |
+| SRCH-02 | Phase 2 | Pending |
+| SRCH-03 | Phase 2 | Pending |
+| SRCH-04 | Phase 2 | Pending |
+| SRCH-05 | Phase 2 | Pending |
+| SRCH-06 | Phase 2 | Pending |
+| SRCH-07 | Phase 2 | Pending |
+| SRCH-08 | Phase 2 | Pending |
+| SRCH-09 | Phase 2 | Pending |
+| SRCH-10 | Phase 2 | Pending |
+| SRCH-11 | Phase 2 | Pending |
+| CONF-01 | Phase 2 | Pending |
+| CONF-02 | Phase 2 | Pending |
+| WEBU-01 | Phase 3 | Pending |
+| WEBU-02 | Phase 3 | Pending |
+| WEBU-03 | Phase 3 | Pending |
+| WEBU-04 | Phase 3 | Pending |
+| WEBU-05 | Phase 3 | Pending |
+| WEBU-06 | Phase 3 | Pending |
+| WEBU-07 | Phase 3 | Pending |
+| WEBU-08 | Phase 3 | Pending |
+| DEPL-01 | Phase 4 | Pending |
 
 **Coverage:**
-- v1 requirements: 22 total
-- Mapped to phases: 0
-- Unmapped: 22 ⚠️
+- v1 requirements: 25 total
+- Mapped to phases: 25
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-23*
-*Last updated: 2026-02-23 after initial definition*
+*Last updated: 2026-02-23 after roadmap creation*

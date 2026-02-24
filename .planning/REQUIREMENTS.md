@@ -48,7 +48,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Deployment
 
-- [ ] **DEPL-01**: Fetcharr runs as a Docker container with docker-compose support
+- [x] **DEPL-01**: Fetcharr runs as a Docker container with docker-compose support
 
 ## v2 Requirements
 
@@ -111,7 +111,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WEBU-06 | Phase 3 | Complete |
 | WEBU-07 | Phase 3 | Complete |
 | WEBU-08 | Phase 3 | Complete |
-| DEPL-01 | Phase 4 | Pending |
+| DEPL-01 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 25 total
@@ -120,4 +120,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-23*
-*Last updated: 2026-02-23 after roadmap creation*
+*Last updated: 2026-02-24 after 04-01 completion*

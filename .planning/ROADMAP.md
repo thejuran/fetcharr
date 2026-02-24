@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation** - Config, state, and API clients with security invariants established
 - [x] **Phase 2: Search Engine** - Scheduler, round-robin, and cycle logic — the core product
 - [x] **Phase 3: Web UI** - Status dashboard and config editor backed by real state data
-- [ ] **Phase 4: Docker** - Multi-stage packaging and release-ready artifact
+- [x] **Phase 4: Docker** - Multi-stage packaging and release-ready artifact
 
 ## Phase Details
 
@@ -83,7 +83,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 04-01-PLAN.md — Multi-stage Dockerfile (pytailwindcss builder + slim production), docker-compose.yml, PUID/PGID entrypoint, HEALTHCHECK, and localhost URL detection
+- [x] 04-01-PLAN.md — Multi-stage Dockerfile (pytailwindcss builder + slim production), docker-compose.yml, PUID/PGID entrypoint, HEALTHCHECK, and localhost URL detection
 
 ## Progress
 
@@ -95,4 +95,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Foundation | 3/3 | Complete | 2026-02-23 |
 | 2. Search Engine | 3/3 | Complete    | 2026-02-24 |
 | 3. Web UI | 3/3 | Complete | 2026-02-24 |
-| 4. Docker | 0/1 | Not started | - |
+| 4. Docker | 1/1 | Complete | 2026-02-24 |

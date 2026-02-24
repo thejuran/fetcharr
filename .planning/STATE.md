@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible media on a schedule, without exposing credentials or expanding attack surface.
-**Current focus:** Phase 3 — Web UI
+**Current focus:** Phase 4 — Docker (Complete)
 
 ## Current Position
 
-Phase: 3 of 4 (Web UI)
-Plan: 3 of 3 in current phase
+Phase: 4 of 4 (Docker)
+Plan: 1 of 1 in current phase
 Status: Phase Complete
-Last activity: 2026-02-23 — Completed 03-03-PLAN.md (Config editor and search-now)
+Last activity: 2026-02-24 — Completed 04-01-PLAN.md (Docker packaging)
 
-Progress: [████████████████████████████░] 90%
+Progress: [██████████████████████████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
+- Total plans completed: 10
 - Average duration: 2min
-- Total execution time: 22min
+- Total execution time: 24min
 
 **By Phase:**
 
@@ -30,9 +30,10 @@ Progress: [███████████████████████
 | 1. Foundation | 3/3 | 8min | 3min |
 | 2. Search Engine | 3/3 | 6min | 2min |
 | 3. Web UI | 3/3 | 8min | 3min |
+| 4. Docker | 1/1 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (2min), 02-03 (2min), 03-01 (3min), 03-02 (2min), 03-03 (3min)
+- Last 5 plans: 02-03 (2min), 03-01 (3min), 03-02 (2min), 03-03 (3min), 04-01 (2min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -73,6 +74,10 @@ Recent decisions affecting current work:
 - [03-03]: API key masking uses password field with empty value + conditional placeholder (never real key in HTML)
 - [03-03]: python-multipart added as runtime dependency for FastAPI form parsing
 - [03-03]: Client recreation on URL/key change to avoid stale connections after config edit
+- [04-01]: pytailwindcss in builder stage only -- not installed in production image
+- [04-01]: HEALTHCHECK uses python3 urllib.request instead of curl (no extra binary in slim image)
+- [04-01]: entrypoint.sh uses exec setpriv so python becomes PID 1 and receives SIGTERM directly
+- [04-01]: docker-compose.yml references ghcr.io image with comment about local build alternative
 
 ### Pending Todos
 
@@ -85,6 +90,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-23
-Stopped at: Completed 03-03-PLAN.md
+Last session: 2026-02-24
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None

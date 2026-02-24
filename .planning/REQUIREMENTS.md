@@ -33,12 +33,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Web UI
 
-- [ ] **WEBU-01**: Dashboard shows last run time and next scheduled run per app
-- [ ] **WEBU-02**: Dashboard shows recent search history with item names and timestamps
-- [ ] **WEBU-03**: Dashboard shows current round-robin queue position per app
-- [ ] **WEBU-04**: Dashboard shows wanted and cutoff unmet item counts per app
+- [x] **WEBU-01**: Dashboard shows last run time and next scheduled run per app
+- [x] **WEBU-02**: Dashboard shows recent search history with item names and timestamps
+- [x] **WEBU-03**: Dashboard shows current round-robin queue position per app
+- [x] **WEBU-04**: Dashboard shows wanted and cutoff unmet item counts per app
 - [ ] **WEBU-05**: User can edit all settings via web UI config editor without file editing
-- [ ] **WEBU-06**: Dashboard shows connection status with "unreachable since" when *arr is down
+- [x] **WEBU-06**: Dashboard shows connection status with "unreachable since" when *arr is down
 - [ ] **WEBU-07**: User can enable/disable each app via toggle without changing other config
 - [ ] **WEBU-08**: User can trigger an immediate search cycle per app via "search now" button
 
@@ -103,12 +103,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SRCH-11 | Phase 2 | Complete |
 | CONF-01 | Phase 2 | Complete |
 | CONF-02 | Phase 2 | Complete |
-| WEBU-01 | Phase 3 | Pending |
-| WEBU-02 | Phase 3 | Pending |
-| WEBU-03 | Phase 3 | Pending |
-| WEBU-04 | Phase 3 | Pending |
+| WEBU-01 | Phase 3 | Complete |
+| WEBU-02 | Phase 3 | Complete |
+| WEBU-03 | Phase 3 | Complete |
+| WEBU-04 | Phase 3 | Complete |
 | WEBU-05 | Phase 3 | Pending |
-| WEBU-06 | Phase 3 | Pending |
+| WEBU-06 | Phase 3 | Complete |
 | WEBU-07 | Phase 3 | Pending |
 | WEBU-08 | Phase 3 | Pending |
 | DEPL-01 | Phase 4 | Pending |

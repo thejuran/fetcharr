@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 3 of 4 (Web UI)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In Progress
-Last activity: 2026-02-23 — Completed 03-01-PLAN.md (Web UI infrastructure)
+Last activity: 2026-02-23 — Completed 03-02-PLAN.md (Dashboard data layer)
 
-Progress: [███████████████████████░░░░░] 70%
+Progress: [█████████████████████████░░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: 2min
-- Total execution time: 17min
+- Total execution time: 19min
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [███████████████████████
 |-------|-------|-------|----------|
 | 1. Foundation | 3/3 | 8min | 3min |
 | 2. Search Engine | 3/3 | 6min | 2min |
-| 3. Web UI | 1/3 | 3min | 3min |
+| 3. Web UI | 2/3 | 5min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (2min), 02-01 (2min), 02-02 (2min), 02-03 (2min), 03-01 (3min)
+- Last 5 plans: 02-01 (2min), 02-02 (2min), 02-03 (2min), 03-01 (3min), 03-02 (2min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -67,6 +67,9 @@ Recent decisions affecting current work:
 - [03-01]: Tailwind CSS v4 compiled via pytailwindcss (v4.2.1 binary auto-downloaded)
 - [03-01]: Job closures read from app.state at execution time for hot-reload readiness
 - [03-01]: Active nav link uses Jinja2 block overrides instead of URL comparison
+- [03-02]: Raw item counts cached before filtering so dashboard shows total wanted/cutoff items
+- [03-02]: Connection health uses first-failure timestamp for unreachable_since (not updated on subsequent failures)
+- [03-02]: App badges use Radarr orange and Sonarr blue ecosystem branding in search log
 
 ### Pending Todos
 
@@ -80,5 +83,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Completed 03-01-PLAN.md
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None

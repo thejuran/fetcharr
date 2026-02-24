@@ -30,7 +30,7 @@ Fetcharr is a single-process automation daemon that cycles through Radarr and So
 - [x] **Phase 9: CI/CD Pipeline** - GitHub Actions for testing, linting, and Docker build validation (completed 2026-02-24)
 - [x] **Phase 10: Release Pipeline** - Automated Docker image publishing and code review convention (completed 2026-02-24)
 - [x] **Phase 11: Search Enhancements** - Hard max limit and persistent search history (completed 2026-02-24)
-- [ ] **Phase 12: Documentation** - README with install guide, config reference, security model, and screenshots
+- [x] **Phase 12: Documentation** - README with install guide, config reference, security model, and screenshots (completed 2026-02-24)
 
 ## Phase Details
 
@@ -81,7 +81,7 @@ Plans:
   2. Every TOML config field is documented with its default value, valid range, and description
   3. README explains the security model — what is protected, what is not, and why there is no authentication
   4. README includes screenshots of the dashboard and config editor showing the actual running UI
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [ ] 12-01-PLAN.md — README with install guide, config reference, security model, and screenshot placeholders
 
@@ -100,4 +100,4 @@ Plans:
 | 9. CI/CD Pipeline | v1.1 | Complete    | 2026-02-24 | - |
 | 10. Release Pipeline | 1/1 | Complete    | 2026-02-24 | - |
 | 11. Search Enhancements | 2/2 | Complete    | 2026-02-24 | - |
-| 12. Documentation | v1.1 | 0/1 | Not started | - |
+| 12. Documentation | 1/1 | Complete   | 2026-02-24 | - |

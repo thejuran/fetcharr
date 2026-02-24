@@ -9,10 +9,10 @@ Requirements for Ship & Document release. Each maps to roadmap phases.
 
 ### Documentation
 
-- [ ] **DOCS-01**: README has install instructions (Docker pull + docker-compose example)
-- [ ] **DOCS-02**: README documents all config options (TOML fields, defaults, valid ranges)
-- [ ] **DOCS-03**: README explains security model (what's protected, what's not, why no auth)
-- [ ] **DOCS-04**: README includes screenshots of dashboard and config editor
+- [x] **DOCS-01**: README has install instructions (Docker pull + docker-compose example)
+- [x] **DOCS-02**: README documents all config options (TOML fields, defaults, valid ranges)
+- [x] **DOCS-03**: README explains security model (what's protected, what's not, why no auth)
+- [x] **DOCS-04**: README includes screenshots of dashboard and config editor
 
 ### CI/CD
 
@@ -59,10 +59,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DOCS-01 | Phase 12 | Pending |
-| DOCS-02 | Phase 12 | Pending |
-| DOCS-03 | Phase 12 | Pending |
-| DOCS-04 | Phase 12 | Pending |
+| DOCS-01 | Phase 12 | Complete |
+| DOCS-02 | Phase 12 | Complete |
+| DOCS-03 | Phase 12 | Complete |
+| DOCS-04 | Phase 12 | Complete |
 | CICD-01 | Phase 9 | Complete |
 | CICD-02 | Phase 9 | Complete |
 | CICD-03 | Phase 9 | Complete |

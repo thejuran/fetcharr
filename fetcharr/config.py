@@ -22,12 +22,18 @@ log_level = "info"
 url = ""           # e.g. "http://radarr:7878"
 api_key = ""       # From Radarr > Settings > General > API Key
 enabled = false
+# search_interval = 30       # Minutes between search cycles
+# search_missing_count = 5   # Missing items to search per cycle
+# search_cutoff_count = 5    # Cutoff items to search per cycle
 
 [sonarr]
 # Sonarr connection settings
 url = ""           # e.g. "http://sonarr:8989"
 api_key = ""       # From Sonarr > Settings > General > API Key
 enabled = false
+# search_interval = 30       # Minutes between search cycles
+# search_missing_count = 5   # Missing items to search per cycle
+# search_cutoff_count = 5    # Cutoff items to search per cycle
 """
 
 

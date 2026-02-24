@@ -17,6 +17,11 @@ class ArrConfig(BaseModel):
     api_key: SecretStr = SecretStr("")
     enabled: bool = False
 
+    # Search tuning (sensible defaults -- override in config to customize)
+    search_interval: int = 30  # Minutes between search cycles
+    search_missing_count: int = 5  # Missing items to search per cycle
+    search_cutoff_count: int = 5  # Cutoff items to search per cycle
+
 
 class GeneralConfig(BaseModel):
     """Global application settings."""

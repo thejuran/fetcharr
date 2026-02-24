@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+import httpx
+
 from fetcharr.clients.base import ArrClient
 
 
@@ -40,4 +42,15 @@ class SonarrClient(ArrClient):
         return await self.get_paginated(
             "/api/v3/wanted/cutoff",
             extra_params={"includeSeries": "true"},
+        )
+
+    async def search_season(self, series_id: int, season_number: int) -> httpx.Response:
+        """Trigger a SeasonSearch command for a specific season."""
+        return await self.post(
+            "/api/v3/command",
+            json_data={
+                "name": "SeasonSearch",
+                "seriesId": series_id,
+                "seasonNumber": season_number,
+            },
         )

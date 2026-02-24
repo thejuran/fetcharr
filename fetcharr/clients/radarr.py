@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+import httpx
+
 from fetcharr.clients.base import ArrClient
 
 
@@ -25,3 +27,10 @@ class RadarrClient(ArrClient):
     async def get_wanted_cutoff(self) -> list[dict[str, Any]]:
         """Fetch all movies that don't meet their quality cutoff."""
         return await self.get_paginated("/api/v3/wanted/cutoff")
+
+    async def search_movies(self, movie_ids: list[int]) -> httpx.Response:
+        """Trigger a MoviesSearch command for the given movie IDs."""
+        return await self.post(
+            "/api/v3/command",
+            json_data={"name": "MoviesSearch", "movieIds": movie_ids},
+        )

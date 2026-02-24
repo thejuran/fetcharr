@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible media on a schedule, without exposing credentials or expanding attack surface.
-**Current focus:** Milestone v1.1 — Ship & Document (Phase 10: Release Pipeline)
+**Current focus:** Milestone v1.1 — Ship & Document (Phase 11: Search Enhancements)
 
 ## Current Position
 
-Phase: 10 of 12 (Release Pipeline)
-Plan: 1 of 1 complete
-Status: Phase 10 complete
-Last activity: 2026-02-24 — Release pipeline and CLAUDE.md created
+Phase: 11 of 12 (Search Enhancements)
+Plan: 1 of 2 complete
+Status: Executing phase 11
+Last activity: 2026-02-24 — Hard max per cycle feature added
 
-Progress: [███████████████████░░░░░░░░░░░] 18/18 plans (v1.0) + 2/? (v1.1)
+Progress: [███████████████████░░░░░░░░░░░] 18/18 plans (v1.0) + 3/? (v1.1)
 
 ## Performance Metrics
 
@@ -29,6 +29,7 @@ Progress: [███████████████████░░░░
 |-------|------|----------|-------|-------|
 | 09-ci-cd-pipeline | 01 | 2min | 2 | 14 |
 | 10-release-pipeline | 01 | 2min | 2 | 2 |
+| 11-search-enhancements | 01 | 2min | 2 | 6 |
 
 ## Accumulated Context
 
@@ -41,6 +42,8 @@ Full decision log in PROJECT.md Key Decisions table.
 - [10-01] Used docker/metadata-action for tag computation rather than manual shell scripting
 - [10-01] Enabled BuildKit GHA cache (cache-from/cache-to) for faster rebuilds
 - [10-01] CLAUDE.md kept to 36 lines as concise working reference
+- [11-01] Proportional split for hard max cap: missing gets floor(missing/total*max), cutoff gets remainder
+- [11-01] Cap applied before slicing (pre-slice pattern) for cleaner integration with cycle functions
 
 ### Pending Todos
 
@@ -54,5 +57,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 10-01-PLAN.md (Release Pipeline)
+Stopped at: Completed 11-01-PLAN.md (Hard Max Per Cycle)
 Resume file: None

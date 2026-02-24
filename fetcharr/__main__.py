@@ -12,6 +12,7 @@ from loguru import logger
 from fetcharr.models.config import CONFIG_PATH
 from fetcharr.search.scheduler import create_lifespan
 from fetcharr.state import STATE_PATH
+from fetcharr.web.middleware import OriginCheckMiddleware
 from fetcharr.web.routes import STATIC_DIR, router
 
 
@@ -35,6 +36,7 @@ async def _run() -> None:
     settings = await startup()
 
     app = FastAPI(lifespan=create_lifespan(settings, STATE_PATH, CONFIG_PATH))
+    app.add_middleware(OriginCheckMiddleware)
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
     app.include_router(router)
 

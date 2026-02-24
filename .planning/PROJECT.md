@@ -37,7 +37,27 @@ Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible 
 
 ### Active
 
-(None — planning next milestone)
+<!-- v1.2 Polish & Harden -->
+
+- [ ] Search history UI with filtering and pagination
+- [ ] Sonarr v3/v4 API version detection and logging
+- [ ] pageSize ceiling logging for large libraries
+- [ ] Push CI workflow to GitHub and verify tests pass
+- [ ] Dashboard position labels show X of Y progress
+- [ ] Application logs visible in web dashboard
+- [ ] Search detail log with outcome info per entry
+- [ ] Episode-by-episode fallback when Sonarr SeasonSearch fails
+
+## Current Milestone: v1.2 Polish & Harden
+
+**Goal:** Harden search resilience, improve dashboard observability, and ship CI to GitHub.
+
+**Target features:**
+- Search history UI with filtering/pagination
+- Sonarr API version detection + episode fallback on season search failure
+- Dashboard improvements (X of Y positions, app logs, search details)
+- pageSize ceiling logging
+- Push CI to GitHub
 
 ### Out of Scope
 
@@ -61,10 +81,11 @@ Registry: ghcr.io/thejuran/fetcharr
 
 Replaces Huntarr's core search functionality without the security liabilities (plaintext passwords, unauthenticated API key exposure, 2FA bypass). Deliberately minimal attack surface.
 
-Known concerns for next milestone:
+Known concerns (addressed in v1.2):
 - Sonarr v3 vs v4 API version detection (currently works via Content-Type header)
 - pageSize ceiling logging for large libraries
 - Search history UI with filtering/pagination (SRCH-14 deferred from v1.1)
+- Season search failures silently skip — need episode-level fallback
 
 ## Constraints
 
@@ -98,4 +119,4 @@ Known concerns for next milestone:
 | Docker Compose only install | No docker run or bare-metal instructions | ✓ Good — simplest path |
 
 ---
-*Last updated: 2026-02-24 after v1.1 milestone*
+*Last updated: 2026-02-24 after v1.2 milestone started*

@@ -5,15 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible media on a schedule, without exposing credentials or expanding attack surface.
-**Current focus:** Planning next milestone
+**Current focus:** v1.2 Polish & Harden
 
 ## Current Position
 
-Phase: 12 of 12 (all milestones complete)
-Status: v1.1 Ship & Document — SHIPPED 2026-02-24
-Last activity: 2026-02-24 — Milestone v1.1 archived
-
-Progress: [██████████████████████████████] 23/23 plans (v1.0: 18, v1.1: 5)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-24 — Milestone v1.2 started
 
 ## Performance Metrics
 

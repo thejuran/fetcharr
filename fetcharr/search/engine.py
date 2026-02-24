@@ -1,13 +1,20 @@
-"""Core search engine utility functions.
+"""Core search engine: utility functions and search cycle orchestrators.
 
-Pure functions for filtering, batching, deduplication, and search logging
-shared by both Radarr and Sonarr search cycles.
+Pure functions for filtering, batching, deduplication, and search logging,
+plus async cycle functions that compose them with API client calls to
+drive the automated search behaviour for Radarr and Sonarr.
 """
 
 from __future__ import annotations
 
 from datetime import datetime, timezone
 
+import httpx
+from loguru import logger
+
+from fetcharr.clients.radarr import RadarrClient
+from fetcharr.clients.sonarr import SonarrClient
+from fetcharr.models.config import Settings
 from fetcharr.state import FetcharrState
 
 SEARCH_LOG_MAX = 50
@@ -134,3 +141,72 @@ def filter_sonarr_episodes(episodes: list[dict]) -> list[dict]:
             continue
         result.append(ep)
     return result
+
+
+async def run_radarr_cycle(
+    client: RadarrClient,
+    state: FetcharrState,
+    settings: Settings,
+) -> FetcharrState:
+    """Run one complete Radarr search cycle: missing batch then cutoff batch.
+
+    Fetches the current wanted-missing and wanted-cutoff lists, filters
+    to monitored items, slices a batch from each queue using independent
+    cursors, triggers ``MoviesSearch`` for each movie, and logs the result.
+
+    Individual search failures are logged and skipped (skip-and-continue).
+    If the fetch calls themselves fail (network/HTTP errors), the entire
+    cycle aborts and cursors remain unchanged.
+
+    Args:
+        client: Connected Radarr API client.
+        state: Mutable application state (modified in place).
+        settings: Application settings with batch size configuration.
+
+    Returns:
+        Updated state with new cursor positions and last_run timestamp.
+    """
+    try:
+        missing = await client.get_wanted_missing()
+        cutoff = await client.get_wanted_cutoff()
+    except (httpx.HTTPStatusError, httpx.ConnectError, httpx.TimeoutException, httpx.HTTPError) as exc:
+        logger.warning("Radarr: Cycle aborted -- {exc}", exc=exc)
+        return state
+
+    # --- Missing queue ---
+    missing = filter_monitored(missing)
+    cursor = state["radarr"]["missing_cursor"]
+    batch, new_cursor = slice_batch(missing, cursor, settings.radarr.search_missing_count)
+    for movie in batch:
+        try:
+            await client.search_movies([movie["id"]])
+            append_search_log(state, "Radarr", "missing", movie["title"])
+            logger.info("Radarr: Searched {title} (missing)", title=movie["title"])
+        except Exception as exc:
+            logger.warning(
+                "Radarr: Failed to search {title}: {exc}",
+                title=movie.get("title", "unknown"),
+                exc=exc,
+            )
+    state["radarr"]["missing_cursor"] = new_cursor
+
+    # --- Cutoff queue ---
+    cutoff = filter_monitored(cutoff)
+    cursor = state["radarr"]["cutoff_cursor"]
+    batch, new_cursor = slice_batch(cutoff, cursor, settings.radarr.search_cutoff_count)
+    for movie in batch:
+        try:
+            await client.search_movies([movie["id"]])
+            append_search_log(state, "Radarr", "cutoff", movie["title"])
+            logger.info("Radarr: Searched {title} (cutoff)", title=movie["title"])
+        except Exception as exc:
+            logger.warning(
+                "Radarr: Failed to search {title}: {exc}",
+                title=movie.get("title", "unknown"),
+                exc=exc,
+            )
+    state["radarr"]["cutoff_cursor"] = new_cursor
+
+    # --- Update last_run ---
+    state["radarr"]["last_run"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    return state

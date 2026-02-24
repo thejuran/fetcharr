@@ -45,6 +45,22 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Security
 
 - [x] **SECR-01**: API keys are stored server-side only and never returned by any HTTP endpoint
+- [x] **SECR-02**: State-changing POST endpoints reject cross-origin requests via Origin/Referer validation
+- [ ] **SECR-03**: ArrConfig URL validates scheme (http/https) and blocks cloud metadata endpoints
+- [ ] **SECR-04**: All form integer fields are bounds-checked and never crash on invalid input
+- [x] **SECR-05**: Docker container drops all capabilities, binds to localhost, and sets no-new-privileges
+- [ ] **SECR-06**: Config file written with restrictive permissions (0o600)
+- [x] **SECR-07**: htmx bundled locally — no external CDN dependency
+
+### Quality & Resilience
+
+- [ ] **QUAL-01**: Concurrent search cycles serialized via asyncio.Lock — no state race condition
+- [ ] **QUAL-02**: Settings validated before writing to disk — invalid config never corrupts TOML file
+- [ ] **QUAL-03**: Atomic state writes clean up temp files on failure; corrupt state recovers to defaults
+- [ ] **QUAL-04**: State file load fills missing keys from defaults for forward-compatible schema migration
+- [ ] **QUAL-05**: Log redaction covers exception tracebacks; settings hot-reload refreshes redaction filter
+- [ ] **QUAL-06**: All API response parsing handles ValidationError gracefully; httpx retry covers RemoteProtocolError
+- [ ] **QUAL-07**: All async code paths (clients, cycles, scheduler, startup) have test coverage
 
 ### Deployment
 
@@ -112,12 +128,25 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WEBU-07 | Phase 3 | Complete |
 | WEBU-08 | Phase 3 | Complete |
 | DEPL-01 | Phase 4 | Complete |
+| SECR-02 | Phase 5 | Complete |
+| SECR-03 | Phase 5 | Planned |
+| SECR-04 | Phase 5 | Planned |
+| SECR-05 | Phase 5 | Complete |
+| SECR-06 | Phase 5 | Planned |
+| SECR-07 | Phase 5 | Complete |
+| QUAL-01 | Phase 6 | Planned |
+| QUAL-02 | Phase 6 | Planned |
+| QUAL-03 | Phase 6 | Planned |
+| QUAL-04 | Phase 6 | Planned |
+| QUAL-05 | Phase 6 | Planned |
+| QUAL-06 | Phase 6 | Planned |
+| QUAL-07 | Phase 7 | Planned |
 
 **Coverage:**
-- v1 requirements: 25 total
-- Mapped to phases: 25
+- v1 requirements: 38 total
+- Mapped to phases: 38
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-23*
-*Last updated: 2026-02-24 after 04-01 completion*
+*Last updated: 2026-02-24 after deep code review — added SECR-02..07, QUAL-01..07*

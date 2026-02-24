@@ -99,7 +99,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Search Engine | 3/3 | Complete | 2026-02-24 |
 | 3. Web UI | 3/3 | Complete | 2026-02-24 |
 | 4. Docker | 1/1 | Complete | 2026-02-24 |
-| 5. Security Hardening | 0/? | Not Started | — |
+| 5. Security Hardening | 1/2 | In Progress | — |
 | 6. Bug Fixes & Resilience | 0/? | Not Started | — |
 | 7. Test Coverage | 0/? | Not Started | — |
 
@@ -118,7 +118,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 **Plans:** 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Origin/Referer CSRF middleware, Docker least-privilege hardening, htmx vendoring
+- [x] 05-01-PLAN.md — Origin/Referer CSRF middleware, Docker least-privilege hardening, htmx vendoring
 - [ ] 05-02-PLAN.md — URL scheme + SSRF validation, integer clamping, log level allowlist, config file permissions
 
 ### Phase 6: Bug Fixes & Resilience

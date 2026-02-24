@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible media on a schedule, without exposing credentials or expanding attack surface.
-**Current focus:** Phase 7 — Test Coverage (Complete)
+**Current focus:** Phase 8 — Tech Debt Cleanup (Complete)
 
 ## Current Position
 
-Phase: 7 of 7 (Test Coverage)
-Plan: 2 of 2 in current phase
+Phase: 8 of 8 (Tech Debt Cleanup)
+Plan: 1 of 1 in current phase
 Status: Complete
-Last activity: 2026-02-24 — Completed 07-02 (Search cycle & scheduler tests)
+Last activity: 2026-02-24 — Completed 08-01 (Dead code removal, template fix, test coverage)
 
-Progress: [██████████████████████████████] 100% (17/17 plans)
+Progress: [██████████████████████████████] 100% (18/18 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
+- Total plans completed: 18
 - Average duration: 2min
-- Total execution time: 38min
+- Total execution time: 40min
 
 **By Phase:**
 
@@ -34,12 +34,14 @@ Progress: [███████████████████████
 | 5. Security Hardening | 2/2 | 4min | 2min |
 | 6. Bug Fixes & Resilience | 3/3 | 6min | 2min |
 | 7. Test Coverage | 2/2 | 4min | 2min |
+| 8. Tech Debt Cleanup | 1/1 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 06-01 (2min), 06-02 (2min), 06-03 (2min), 07-01 (2min), 07-02 (2min)
+- Last 5 plans: 06-02 (2min), 06-03 (2min), 07-01 (2min), 07-02 (2min), 08-01 (2min)
 - Trend: Consistent
 
 *Updated after each plan completion*
+| Phase 08 P01 | 2min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -107,6 +109,7 @@ Recent decisions affecting current work:
 - Phase 5 added: Security Hardening (CSRF, SSRF, input validation, Docker hardening, CDN removal)
 - Phase 6 added: Bug Fixes & Resilience (race conditions, error handling, state recovery, log redaction)
 - Phase 7 added: Test Coverage (async path tests for clients, cycles, scheduler, startup)
+- Phase 8 added: Tech Debt Cleanup (dead code removal, template url_for fix, search_now test)
 
 ### Pending Todos
 
@@ -120,5 +123,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 07-02-PLAN.md
+Stopped at: Completed 08-01-PLAN.md
 Resume file: None

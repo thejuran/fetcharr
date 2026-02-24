@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Security Hardening** - CSRF, SSRF, input validation, Docker hardening, and CDN removal (completed 2026-02-24)
 - [x] **Phase 6: Bug Fixes & Resilience** - Race conditions, error handling, state recovery, and log redaction (completed 2026-02-24)
 - [x] **Phase 7: Test Coverage** - Async path tests for clients, cycles, scheduler, and startup (completed 2026-02-24)
-- [ ] **Phase 8: Tech Debt Cleanup** - Dead code removal, missing test, stale docs (gap closure from audit)
+- [x] **Phase 8: Tech Debt Cleanup** - Dead code removal, missing test, stale docs (gap closure from audit)
 
 ## Phase Details
 
@@ -103,7 +103,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 5. Security Hardening | 2/2 | Complete | 2026-02-24 |
 | 6. Bug Fixes & Resilience | 3/3 | Complete | 2026-02-24 |
 | 7. Test Coverage | 2/2 | Complete | 2026-02-24 |
-| 8. Tech Debt Cleanup | 0/? | Not Started | — |
+| 8. Tech Debt Cleanup | 1/1 | Complete | 2026-02-24 |
 
 ### Phase 5: Security Hardening
 **Goal**: All web-facing endpoints are protected against cross-origin attacks and input abuse, Docker defaults follow least-privilege, and no external CDN dependency remains

@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible media on a schedule, without exposing credentials or expanding attack surface.
-**Current focus:** Phase 15 - Search History UI
+**Current focus:** Phase 16 - Deep Code Review
 
 ## Current Position
 
-Phase: 15 (third of 4 in v1.2)
-Plan: 2 of 2 in Phase 15 complete
-Status: Phase 15 complete
-Last activity: 2026-02-24 -- Completed 15-02 (Search History Tests)
+Phase: 16 (fourth of 4 in v1.2)
+Plan: 0 of 1 in Phase 16
+Status: Review report generated, fixes pending
+Last activity: 2026-02-24 -- Generated deep code review report (18 findings >= 70 confidence)
 
-Progress: [███████░░░] 70%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
@@ -66,5 +66,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 15-02-PLAN.md (Search History Tests)
+Stopped at: Generated Phase 16 deep review report (16-REVIEW.md)
 Resume file: None

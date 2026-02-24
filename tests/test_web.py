@@ -6,6 +6,7 @@ key preservation, PRG redirect), htmx partials, and search-now validation.
 
 from __future__ import annotations
 
+import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -88,6 +89,9 @@ def test_app(tmp_path):
     # Paths
     app.state.config_path = tmp_path / "fetcharr.toml"
     app.state.state_path = tmp_path / "state.json"
+
+    # Search lock (needed by search_now endpoint)
+    app.state.search_lock = asyncio.Lock()
 
     return app
 
@@ -243,3 +247,16 @@ def test_search_now_invalid_app(client):
     response = client.post("/api/search-now/invalid")
     assert response.status_code == 400, f"Expected 400, got {response.status_code}"
     assert "Invalid app" in response.text
+
+
+def test_search_now_happy_path(client, test_app):
+    """POST /api/search-now/radarr triggers cycle and returns 200 with updated card."""
+    with patch(
+        "fetcharr.web.routes.run_radarr_cycle",
+        new=AsyncMock(return_value=test_app.state.fetcharr_state),
+    ), patch(
+        "fetcharr.web.routes.save_state",
+    ):
+        response = client.post("/api/search-now/radarr")
+        assert response.status_code == 200
+        assert "Radarr" in response.text  # Card partial contains app name

@@ -47,7 +47,7 @@ class TestValidateArrUrl:
     def test_link_local_ip_blocked(self) -> None:
         ok, err = validate_arr_url("http://169.254.42.42")
         assert ok is False
-        assert "link-local" in err.lower()
+        assert "blocked" in err.lower()
 
     def test_private_192_168_allowed(self) -> None:
         ok, err = validate_arr_url("http://192.168.1.100:7878")

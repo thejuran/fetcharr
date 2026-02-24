@@ -10,7 +10,7 @@ import ipaddress
 from urllib.parse import urlparse
 
 # Hostnames explicitly blocked to prevent SSRF against cloud metadata services.
-BLOCKED_HOSTS: set[str] = {"169.254.169.254", "metadata.google.internal"}
+BLOCKED_HOSTS: set[str] = {"169.254.169.254", "metadata.google.internal", "metadata.azure.com", "100.100.100.200"}
 
 # Only these log levels are accepted; anything else defaults to "info".
 ALLOWED_LOG_LEVELS: set[str] = {"debug", "info", "warning", "error"}
@@ -48,8 +48,8 @@ def validate_arr_url(url: str) -> tuple[bool, str]:
 
     try:
         addr = ipaddress.ip_address(hostname)
-        if addr.is_link_local:
-            return (False, "Link-local address blocked")
+        if addr.is_link_local or addr.is_loopback:
+            return (False, "Blocked address")
     except ValueError:
         # Not an IP literal (e.g. "radarr") -- perfectly fine.
         pass

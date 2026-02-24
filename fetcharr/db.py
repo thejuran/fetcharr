@@ -115,12 +115,12 @@ async def get_recent_searches(db_path: Path, limit: int = 50) -> list[dict]:
     """
     async with aiosqlite.connect(db_path) as db:
         db.row_factory = aiosqlite.Row
-        cursor = await db.execute(
+        async with db.execute(
             "SELECT timestamp, app, queue_type, item_name, outcome, detail "
             "FROM search_history ORDER BY id DESC LIMIT ?",
             (limit,),
-        )
-        rows = await cursor.fetchall()
+        ) as cursor:
+            rows = await cursor.fetchall()
     return [
         {
             "name": row["item_name"],
@@ -158,6 +158,11 @@ async def get_search_history(
     Returns:
         Dict with keys: entries, total, page, per_page, total_pages.
     """
+    if per_page < 1:
+        per_page = 50
+    if page < 1:
+        page = 1
+
     conditions: list[str] = []
     params: list[str | int] = []
 
@@ -186,21 +191,21 @@ async def get_search_history(
         db.row_factory = aiosqlite.Row
 
         # Total count
-        cursor = await db.execute(
+        async with db.execute(
             f"SELECT COUNT(*) AS cnt FROM search_history{where_clause}",
             params,
-        )
-        row = await cursor.fetchone()
-        total_count: int = row["cnt"]
+        ) as cursor:
+            row = await cursor.fetchone()
+            total_count: int = row["cnt"]
 
         # Paginated results
         offset = (page - 1) * per_page
-        cursor = await db.execute(
+        async with db.execute(
             f"SELECT id, timestamp, app, queue_type, item_name, outcome, detail "
             f"FROM search_history{where_clause} ORDER BY id DESC LIMIT ? OFFSET ?",
             [*params, per_page, offset],
-        )
-        rows = await cursor.fetchall()
+        ) as cursor:
+            rows = await cursor.fetchall()
 
     entries = [
         {

@@ -86,7 +86,7 @@
                hx-trigger="keyup changed delay:300ms"
                hx-target="#history-results"
                hx-swap="outerHTML"
-               hx-vals='{"app": "{{ active_apps | join(',') }}", "queue": "{{ active_queues | join(',') }}", "outcome": "{{ active_outcomes | join(',') }}", "page": "1"}'
+               hx-vals="{{ {'app': active_apps | join(','), 'queue': active_queues | join(','), 'outcome': active_outcomes | join(','), 'page': '1'} | tojson }}"
                class="w-full bg-fetcharr-bg border border-fetcharr-border text-fetcharr-text rounded px-3 py-1.5 text-sm placeholder-fetcharr-muted focus:outline-none focus:border-fetcharr-green">
       </div>
     </div>

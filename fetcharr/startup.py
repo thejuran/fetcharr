@@ -7,6 +7,7 @@ connection validation, and startup banner display.
 from __future__ import annotations
 
 from pathlib import Path
+from urllib.parse import urlparse
 
 from loguru import logger
 
@@ -16,6 +17,35 @@ from fetcharr.clients.sonarr import SonarrClient
 from fetcharr.config import ensure_config
 from fetcharr.logging import setup_logging
 from fetcharr.models.config import CONFIG_PATH, Settings
+
+
+LOCALHOST_PATTERNS = {"localhost", "127.0.0.1", "::1"}
+
+
+def check_localhost_urls(settings: Settings) -> None:
+    """Warn if any enabled app's URL points to localhost.
+
+    Inside Docker, ``localhost`` refers to the container itself, not the
+    host machine.  This is the most common networking mistake for new
+    self-hosters.  The warning fires before connection validation so the
+    user sees a clear explanation rather than a mysterious timeout.
+    """
+    for name in ("radarr", "sonarr"):
+        cfg = getattr(settings, name)
+        if not cfg.enabled:
+            continue
+        hostname = urlparse(cfg.url).hostname
+        if hostname and hostname in LOCALHOST_PATTERNS:
+            logger.warning(
+                "{app} URL ({url}) uses localhost, which inside Docker "
+                "refers to the container itself, not your host machine. "
+                "Use 'host.docker.internal' (Docker Desktop) or the "
+                "container/service name (e.g. 'http://{app_lower}:{port}') instead.",
+                app=name.title(),
+                url=cfg.url,
+                app_lower=name,
+                port="7878" if name == "radarr" else "8989",
+            )
 
 
 def collect_secrets(settings: Settings) -> list[str]:
@@ -130,6 +160,9 @@ async def startup(config_path: Path | None = None) -> Settings:
 
     # 4. Print banner
     print_banner(settings)
+
+    # 4.5 Warn about localhost URLs (common Docker networking mistake)
+    check_localhost_urls(settings)
 
     # 5. Validate connections
     results = await validate_connections(settings)

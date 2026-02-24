@@ -15,12 +15,14 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.testclient import TestClient
 
 from fetcharr.db import init_db, insert_search_entry
+from fetcharr.log_buffer import LogEntry, log_buffer
 from fetcharr.web.routes import STATIC_DIR, router
 
 
 @pytest.fixture
 async def test_app(tmp_path):
     """Build a minimal FastAPI app with mocked state for route testing."""
+    log_buffer.clear()  # Prevent test pollution from module-level singleton
     app = FastAPI()
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
     app.include_router(router)
@@ -260,3 +262,34 @@ def test_search_now_happy_path(client, test_app):
         response = client.post("/api/search-now/radarr")
         assert response.status_code == 200
         assert "Radarr" in response.text  # Card partial contains app name
+
+
+def test_dashboard_shows_log_viewer_section(client):
+    """GET / response contains the Application Log section heading."""
+    # Add a sample log entry so the viewer has content
+    log_buffer.add(LogEntry("2026-01-15 10:30:00", "INFO", "Test log message for dashboard"))
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "Application Log" in response.text, "Dashboard should show Application Log section"
+    assert "Test log message for dashboard" in response.text, "Dashboard should show log entry"
+
+
+def test_log_viewer_partial_returns_200(client):
+    """GET /partials/log-viewer returns 200 with htmx attributes."""
+    response = client.get("/partials/log-viewer")
+    assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+    assert "hx-get" in response.text, "Log viewer should have hx-get attribute"
+    assert "every 5s" in response.text, "Log viewer should poll every 5 seconds"
+
+
+def test_log_viewer_partial_shows_entries(client):
+    """GET /partials/log-viewer shows log entries when buffer has data."""
+    log_buffer.clear()
+    log_buffer.add(LogEntry("2026-01-15 10:30:00", "ERROR", "Something went wrong"))
+    log_buffer.add(LogEntry("2026-01-15 10:30:01", "WARNING", "Watch out"))
+    response = client.get("/partials/log-viewer")
+    assert response.status_code == 200
+    assert "Something went wrong" in response.text
+    assert "Watch out" in response.text
+    assert "text-red-400" in response.text, "ERROR should use red color"
+    assert "text-yellow-400" in response.text, "WARNING should use yellow color"

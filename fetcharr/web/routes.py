@@ -20,6 +20,7 @@ from loguru import logger
 from fetcharr.clients.radarr import RadarrClient
 from fetcharr.clients.sonarr import SonarrClient
 from fetcharr.db import get_recent_searches
+from fetcharr.log_buffer import log_buffer
 from fetcharr.logging import setup_logging
 from fetcharr.models.config import Settings as SettingsModel
 from fetcharr.search.engine import run_radarr_cycle, run_sonarr_cycle
@@ -87,11 +88,12 @@ async def dashboard(request: Request) -> HTMLResponse:
             apps.append(ctx)
 
     search_log = await get_recent_searches(request.app.state.db_path)
+    log_entries = log_buffer.get_recent(30)
 
     return templates.TemplateResponse(
         request=request,
         name="dashboard.html",
-        context={"apps": apps, "search_log": search_log},
+        context={"apps": apps, "search_log": search_log, "log_entries": log_entries},
     )
 
 
@@ -301,4 +303,15 @@ async def partial_search_log(request: Request) -> HTMLResponse:
         request=request,
         name="partials/search_log.html",
         context={"search_log": search_log},
+    )
+
+
+@router.get("/partials/log-viewer", response_class=HTMLResponse)
+async def partial_log_viewer(request: Request) -> HTMLResponse:
+    """Return an HTML fragment for the application log viewer (htmx partial)."""
+    log_entries = log_buffer.get_recent(30)
+    return templates.TemplateResponse(
+        request=request,
+        name="partials/log_viewer.html",
+        context={"log_entries": log_entries},
     )

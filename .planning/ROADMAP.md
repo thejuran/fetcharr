@@ -55,11 +55,11 @@ Fetcharr is a single-process automation daemon that cycles through Radarr and So
   1. CI workflow runs on GitHub Actions and all tests pass on remote runners
   2. Fetcharr logs the detected Sonarr API version (v3 or v4) at startup
   3. Each search cycle logs the total item count fetched so users can detect pageSize truncation in large libraries
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 13-01: TBD
-- [ ] 13-02: TBD
+- [ ] 13-01-PLAN.md -- CI workflow hardening with caching for remote runners
+- [ ] 13-02-PLAN.md -- Sonarr API version detection and per-cycle diagnostic logging
 
 ### Phase 14: Dashboard Observability
 **Goal**: Users can see detailed search progress, outcomes, and application logs directly in the web dashboard
@@ -120,7 +120,7 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16
 | 10. Release Pipeline | v1.1 | 1/1 | Complete | 2026-02-24 |
 | 11. Search Enhancements | v1.1 | 2/2 | Complete | 2026-02-24 |
 | 12. Documentation | v1.1 | 1/1 | Complete | 2026-02-24 |
-| 13. CI & Search Diagnostics | v1.2 | 0/TBD | Not started | - |
+| 13. CI & Search Diagnostics | v1.2 | 0/2 | Not started | - |
 | 14. Dashboard Observability | v1.2 | 0/TBD | Not started | - |
 | 15. Search History UI | v1.2 | 0/TBD | Not started | - |
 | 16. Sonarr Episode Fallback | v1.2 | 0/TBD | Not started | - |

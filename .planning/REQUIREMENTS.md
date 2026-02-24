@@ -9,8 +9,8 @@ Requirements for v1.2 Polish & Harden. Each maps to roadmap phases.
 
 ### Search Resilience
 
-- [ ] **SRCH-15**: Fetcharr detects Sonarr v3 vs v4 API version at startup and logs it
-- [ ] **SRCH-16**: Fetcharr logs total item count fetched per cycle so users can diagnose pageSize truncation
+- [x] **SRCH-15**: Fetcharr detects Sonarr v3 vs v4 API version at startup and logs it
+- [x] **SRCH-16**: Fetcharr logs total item count fetched per cycle so users can diagnose pageSize truncation
 - [ ] **SRCH-17**: Sonarr episode-by-episode fallback triggers automatically when SeasonSearch fails
 
 ### Dashboard & UI
@@ -58,8 +58,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | SRCH-14 | Phase 15 | Pending |
-| SRCH-15 | Phase 13 | Pending |
-| SRCH-16 | Phase 13 | Pending |
+| SRCH-15 | Phase 13 | Complete |
+| SRCH-16 | Phase 13 | Complete |
 | SRCH-17 | Phase 16 | Pending |
 | WEBU-09 | Phase 14 | Pending |
 | WEBU-10 | Phase 14 | Pending |

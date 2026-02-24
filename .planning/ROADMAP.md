@@ -40,7 +40,7 @@ Fetcharr is a single-process automation daemon that cycles through Radarr and So
 
 **Milestone Goal:** Harden search resilience, improve dashboard observability, and ship CI to GitHub.
 
-- [ ] **Phase 13: CI & Search Diagnostics** - Push CI to GitHub and add backend search diagnostic logging
+- [x] **Phase 13: CI & Search Diagnostics** - Push CI to GitHub and add backend search diagnostic logging (completed 2026-02-24)
 - [ ] **Phase 14: Dashboard Observability** - Enhance dashboard with position progress, app logs, and search detail
 - [ ] **Phase 15: Search History UI** - Browsable search history with filtering and pagination
 - [ ] **Phase 16: Sonarr Episode Fallback** - Automatic episode-level retry when season search fails
@@ -120,7 +120,7 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16
 | 10. Release Pipeline | v1.1 | 1/1 | Complete | 2026-02-24 |
 | 11. Search Enhancements | v1.1 | 2/2 | Complete | 2026-02-24 |
 | 12. Documentation | v1.1 | 1/1 | Complete | 2026-02-24 |
-| 13. CI & Search Diagnostics | 1/2 | In Progress|  | - |
+| 13. CI & Search Diagnostics | 2/2 | Complete   | 2026-02-24 | - |
 | 14. Dashboard Observability | v1.2 | 0/TBD | Not started | - |
 | 15. Search History UI | v1.2 | 0/TBD | Not started | - |
 | 16. Sonarr Episode Fallback | v1.2 | 0/TBD | Not started | - |

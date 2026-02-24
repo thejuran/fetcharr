@@ -210,3 +210,75 @@ async def run_radarr_cycle(
     # --- Update last_run ---
     state["radarr"]["last_run"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     return state
+
+
+async def run_sonarr_cycle(
+    client: SonarrClient,
+    state: FetcharrState,
+    settings: Settings,
+) -> FetcharrState:
+    """Run one complete Sonarr search cycle: missing batch then cutoff batch.
+
+    Fetches the current wanted-missing and wanted-cutoff episode lists,
+    filters to monitored episodes with past air dates, deduplicates to
+    unique seasons, slices a batch from each queue using independent
+    cursors, triggers ``SeasonSearch`` for each season, and logs the result.
+
+    Individual search failures are logged and skipped (skip-and-continue).
+    If the fetch calls themselves fail (network/HTTP errors), the entire
+    cycle aborts and cursors remain unchanged.
+
+    Args:
+        client: Connected Sonarr API client.
+        state: Mutable application state (modified in place).
+        settings: Application settings with batch size configuration.
+
+    Returns:
+        Updated state with new cursor positions and last_run timestamp.
+    """
+    try:
+        missing_episodes = await client.get_wanted_missing()
+        cutoff_episodes = await client.get_wanted_cutoff()
+    except (httpx.HTTPStatusError, httpx.ConnectError, httpx.TimeoutException, httpx.HTTPError) as exc:
+        logger.warning("Sonarr: Cycle aborted -- {exc}", exc=exc)
+        return state
+
+    # --- Missing queue ---
+    missing_episodes = filter_sonarr_episodes(missing_episodes)
+    missing_seasons = deduplicate_to_seasons(missing_episodes)
+    cursor = state["sonarr"]["missing_cursor"]
+    batch, new_cursor = slice_batch(missing_seasons, cursor, settings.sonarr.search_missing_count)
+    for season in batch:
+        try:
+            await client.search_season(season["seriesId"], season["seasonNumber"])
+            append_search_log(state, "Sonarr", "missing", season["display_name"])
+            logger.info("Sonarr: Searched {name} (missing)", name=season["display_name"])
+        except Exception as exc:
+            logger.warning(
+                "Sonarr: Failed to search {name}: {exc}",
+                name=season.get("display_name", "unknown"),
+                exc=exc,
+            )
+    state["sonarr"]["missing_cursor"] = new_cursor
+
+    # --- Cutoff queue ---
+    cutoff_episodes = filter_sonarr_episodes(cutoff_episodes)
+    cutoff_seasons = deduplicate_to_seasons(cutoff_episodes)
+    cursor = state["sonarr"]["cutoff_cursor"]
+    batch, new_cursor = slice_batch(cutoff_seasons, cursor, settings.sonarr.search_cutoff_count)
+    for season in batch:
+        try:
+            await client.search_season(season["seriesId"], season["seasonNumber"])
+            append_search_log(state, "Sonarr", "cutoff", season["display_name"])
+            logger.info("Sonarr: Searched {name} (cutoff)", name=season["display_name"])
+        except Exception as exc:
+            logger.warning(
+                "Sonarr: Failed to search {name}: {exc}",
+                name=season.get("display_name", "unknown"),
+                exc=exc,
+            )
+    state["sonarr"]["cutoff_cursor"] = new_cursor
+
+    # --- Update last_run ---
+    state["sonarr"]["last_run"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    return state

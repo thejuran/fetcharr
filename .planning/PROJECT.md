@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A lightweight Docker-based tool that automates searches in Radarr and Sonarr for wanted and cutoff unmet items. Configurable round-robin searches at configurable intervals with a dark theme web UI for status monitoring and config editing. Includes CI/CD pipeline, automated GHCR publishing, SQLite search history, and comprehensive documentation. Built with Python/FastAPI and htmx/Jinja2. Zero credential exposure by design.
+A lightweight Docker-based tool that automates searches in Radarr and Sonarr for wanted and cutoff unmet items. Configurable round-robin searches at configurable intervals with a dark theme web UI featuring dashboard observability (position progress, outcome badges, live log viewer), browsable search history with filtering/pagination, and config editing. Includes CI/CD pipeline, automated GHCR publishing, SQLite search history, and comprehensive documentation. Built with Python/FastAPI and htmx/Jinja2. Zero credential exposure by design.
 
 ## Core Value
 
@@ -34,30 +34,18 @@ Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible 
 - ✓ Local deep code review convention (Claude offers /deep-review before push) — v1.1
 - ✓ Configurable hard limit / safety ceiling on max items per cycle — v1.1
 - ✓ Persistent search history beyond in-memory log (SQLite storage) — v1.1
+- ✓ Search history UI with filtering and pagination — v1.2
+- ✓ Sonarr v3/v4 API version detection and logging — v1.2
+- ✓ pageSize ceiling logging for large libraries — v1.2
+- ✓ CI workflow pushed to GitHub with caching for fast remote runs — v1.2
+- ✓ Dashboard position labels show "X of Y" progress — v1.2
+- ✓ Application logs visible in web dashboard (live log viewer) — v1.2
+- ✓ Search detail log with outcome/detail info per entry — v1.2
+- ✓ Deep code review: XSS, SSRF, cursor, atomic write, input validation fixes — v1.2
 
 ### Active
 
-<!-- v1.2 Polish & Harden -->
-
-- [ ] Search history UI with filtering and pagination
-- [ ] Sonarr v3/v4 API version detection and logging
-- [ ] pageSize ceiling logging for large libraries
-- [ ] Push CI workflow to GitHub and verify tests pass
-- [ ] Dashboard position labels show X of Y progress
-- [ ] Application logs visible in web dashboard
-- [ ] Search detail log with outcome info per entry
-- [ ] Episode-by-episode fallback when Sonarr SeasonSearch fails
-
-## Current Milestone: v1.2 Polish & Harden
-
-**Goal:** Harden search resilience, improve dashboard observability, and ship CI to GitHub.
-
-**Target features:**
-- Search history UI with filtering/pagination
-- Sonarr API version detection + episode fallback on season search failure
-- Dashboard improvements (X of Y positions, app logs, search details)
-- pageSize ceiling logging
-- Push CI to GitHub
+(None — define in next milestone)
 
 ### Out of Scope
 
@@ -73,19 +61,22 @@ Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible 
 
 ## Context
 
-Shipped v1.1 with ~4,012 Python LOC. 115+ tests passing.
+Shipped v1.2 with ~5,225 Python LOC. 174 tests passing.
 Tech stack: Python 3.13, FastAPI, httpx, Pydantic, APScheduler, aiosqlite, Jinja2, htmx, Tailwind CSS v4, loguru, ruff.
 Docker: multi-stage build with pytailwindcss builder, python:3.13-slim production, PUID/PGID entrypoint.
-CI/CD: GitHub Actions (pytest, ruff, Docker build validation) + GHCR release workflow.
+CI/CD: GitHub Actions (pytest, ruff, Docker build validation) with uv caching + GHCR release workflow with BuildKit cache.
 Registry: ghcr.io/thejuran/fetcharr
 
 Replaces Huntarr's core search functionality without the security liabilities (plaintext passwords, unauthenticated API key exposure, 2FA bypass). Deliberately minimal attack surface.
 
-Known concerns (addressed in v1.2):
-- Sonarr v3 vs v4 API version detection (currently works via Content-Type header)
-- pageSize ceiling logging for large libraries
-- Search history UI with filtering/pagination (SRCH-14 deferred from v1.1)
-- Season search failures silently skip — need episode-level fallback
+Known tech debt (from v1.2 deep code review, deferred to next milestone):
+- No rate limiting on search-now endpoint
+- No CSRF protection on settings POST
+- Unbounded search history table growth
+- No connection pooling for aiosqlite
+- No health check endpoint or graceful shutdown handler
+- No request timeout on outbound HTTP calls
+- Hardcoded pageSize defaults not configurable
 
 ## Constraints
 
@@ -117,6 +108,14 @@ Known concerns (addressed in v1.2):
 | Connection-per-op SQLite | aiosqlite context manager per function call | ✓ Good |
 | Auto-prune at 500 rows | DELETE after each insert keeps DB bounded | ✓ Good |
 | Docker Compose only install | No docker run or bare-metal instructions | ✓ Good — simplest path |
+| uv cache + BuildKit GHA cache in CI | Faster remote CI runs without adding complexity | ✓ Good |
+| Sonarr version detection reuses validate_connection endpoint | No extra network call for version check | ✓ Good |
+| Failed searches recorded to DB | Enables outcome tracking and history filtering | ✓ Good |
+| Closure-based redacting buffer sink | Secrets redacted before buffer storage, secret list stays in logging.py | ✓ Good |
+| Toggle-pill filter pattern for history | URL param manipulation in Jinja2, no JS framework needed | ✓ Good |
+| hx-vals tojson for XSS prevention | Double-quoted tojson filter prevents single-quote breakout | ✓ Good |
+| Atomic config write (tempfile + fsync + os.replace) | Matches state.py pattern, prevents partial writes | ✓ Good |
+| Episode fallback dropped (SRCH-17) | Sonarr SeasonSearch natively handles both season packs and episodes | ✓ Good — avoided unnecessary complexity |
 
 ---
-*Last updated: 2026-02-24 after v1.2 milestone started*
+*Last updated: 2026-02-24 after v1.2 milestone*

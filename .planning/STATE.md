@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible media on a schedule, without exposing credentials or expanding attack surface.
-**Current focus:** Phase 7 — Test Coverage (In Progress)
+**Current focus:** Phase 7 — Test Coverage (Complete)
 
 ## Current Position
 
 Phase: 7 of 7 (Test Coverage)
-Plan: 1 of 2 in current phase
-Status: In Progress
-Last activity: 2026-02-24 — Completed 07-01 (ArrClient base method tests)
+Plan: 2 of 2 in current phase
+Status: Complete
+Last activity: 2026-02-24 — Completed 07-02 (Search cycle & scheduler tests)
 
-Progress: [███████████████████████████░░░] 93% (16/17 plans)
+Progress: [██████████████████████████████] 100% (17/17 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
+- Total plans completed: 17
 - Average duration: 2min
-- Total execution time: 36min
+- Total execution time: 38min
 
 **By Phase:**
 
@@ -33,10 +33,10 @@ Progress: [███████████████████████
 | 4. Docker | 1/1 | 2min | 2min |
 | 5. Security Hardening | 2/2 | 4min | 2min |
 | 6. Bug Fixes & Resilience | 3/3 | 6min | 2min |
-| 7. Test Coverage | 1/2 | 2min | 2min |
+| 7. Test Coverage | 2/2 | 4min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 05-02 (2min), 06-01 (2min), 06-02 (2min), 06-03 (2min), 07-01 (2min)
+- Last 5 plans: 06-01 (2min), 06-02 (2min), 06-03 (2min), 07-01 (2min), 07-02 (2min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -99,6 +99,8 @@ Recent decisions affecting current work:
 - [06-03]: Log redaction refreshed after settings save to pick up changed API keys
 - [07-01]: MockTransport AsyncClient requires base_url to resolve relative paths for cookie extraction
 - [07-01]: conftest.py uses plain factory functions (not fixtures) for reusable test helpers
+- [07-02]: AsyncMock with return_value/side_effect for client methods (cleaner than MockTransport for orchestration-level tests)
+- [07-02]: Fresh _default_state() per test to prevent shared mutable state contamination
 
 ### Roadmap Evolution
 
@@ -118,5 +120,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 07-01-PLAN.md
+Stopped at: Completed 07-02-PLAN.md
 Resume file: None

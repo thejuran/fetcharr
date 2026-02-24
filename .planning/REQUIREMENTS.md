@@ -140,7 +140,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QUAL-04 | Phase 6 | Planned |
 | QUAL-05 | Phase 6 | Planned |
 | QUAL-06 | Phase 6 | Planned |
-| QUAL-07 | Phase 7 | Planned |
+| QUAL-07 | Phase 7 | Complete |
 
 **Coverage:**
 - v1 requirements: 38 total

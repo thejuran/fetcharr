@@ -1,16 +1,27 @@
 """Web UI routes for Fetcharr dashboard and settings.
 
 Provides the main dashboard page with htmx-polling app cards and search log,
-a settings placeholder, and partial endpoints for htmx fragment updates.
+a config editor with masked API keys and hot-reload, a search-now trigger,
+and partial endpoints for htmx fragment updates.
 """
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from pathlib import Path
 
+import tomli_w
 from fastapi import APIRouter, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from loguru import logger
+
+from fetcharr.clients.radarr import RadarrClient
+from fetcharr.clients.sonarr import SonarrClient
+from fetcharr.config import load_settings
+from fetcharr.search.engine import run_radarr_cycle, run_sonarr_cycle
+from fetcharr.search.scheduler import make_search_job
+from fetcharr.state import save_state
 
 _PKG_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = _PKG_DIR / "templates"
@@ -82,11 +93,161 @@ async def dashboard(request: Request) -> HTMLResponse:
 
 @router.get("/settings", response_class=HTMLResponse)
 async def settings_page(request: Request) -> HTMLResponse:
-    """Render the placeholder settings page."""
+    """Render the settings page with pre-filled form and masked API keys."""
+    settings = request.app.state.settings
+    apps = {}
+    for name in ("radarr", "sonarr"):
+        cfg = getattr(settings, name)
+        apps[name] = {
+            "url": cfg.url,
+            "has_api_key": bool(cfg.api_key.get_secret_value()),
+            "enabled": cfg.enabled,
+            "search_interval": cfg.search_interval,
+            "search_missing_count": cfg.search_missing_count,
+            "search_cutoff_count": cfg.search_cutoff_count,
+        }
     return templates.TemplateResponse(
         request=request,
         name="settings.html",
-        context={},
+        context={
+            "apps": apps,
+            "log_level": settings.general.log_level,
+        },
+    )
+
+
+@router.post("/settings")
+async def save_settings(request: Request) -> RedirectResponse:
+    """Save settings from form data: write TOML, reload, update scheduler."""
+    form = await request.form()
+    current_settings = request.app.state.settings
+    config_path = request.app.state.config_path
+    state_path = request.app.state.state_path
+    scheduler = request.app.state.scheduler
+
+    # Build new config dict from form data
+    new_config: dict = {
+        "general": {
+            "log_level": form.get("log_level", "info"),
+        },
+    }
+
+    for name in ("radarr", "sonarr"):
+        current_cfg = getattr(current_settings, name)
+        submitted_key = form.get(f"{name}_api_key", "").strip()
+        new_config[name] = {
+            "url": form.get(f"{name}_url", "").strip(),
+            "api_key": submitted_key if submitted_key else current_cfg.api_key.get_secret_value(),
+            "enabled": form.get(f"{name}_enabled") == "on",
+            "search_interval": int(form.get(f"{name}_search_interval", 30)),
+            "search_missing_count": int(form.get(f"{name}_search_missing_count", 5)),
+            "search_cutoff_count": int(form.get(f"{name}_search_cutoff_count", 5)),
+        }
+
+    # Write TOML and reload settings
+    config_path.write_text(tomli_w.dumps(new_config))
+    new_settings = load_settings(config_path)
+    request.app.state.settings = new_settings
+
+    # Handle scheduler updates for each app
+    for name in ("radarr", "sonarr"):
+        new_cfg = getattr(new_settings, name)
+        old_cfg = getattr(current_settings, name)
+        job_id = f"{name}_search"
+        existing_job = scheduler.get_job(job_id)
+
+        if not new_cfg.enabled:
+            # Disable: remove job and close client
+            if existing_job:
+                scheduler.remove_job(job_id)
+            client = getattr(request.app.state, f"{name}_client", None)
+            if client:
+                await client.close()
+                setattr(request.app.state, f"{name}_client", None)
+            logger.info("{name} disabled", name=name.title())
+
+        elif new_cfg.enabled:
+            # Check if client needs recreation (URL or API key changed)
+            url_changed = new_cfg.url != old_cfg.url
+            key_changed = (
+                new_cfg.api_key.get_secret_value()
+                != old_cfg.api_key.get_secret_value()
+            )
+
+            if url_changed or key_changed or not getattr(request.app.state, f"{name}_client", None):
+                # Close old client if exists
+                old_client = getattr(request.app.state, f"{name}_client", None)
+                if old_client:
+                    await old_client.close()
+                # Create new client
+                ClientClass = RadarrClient if name == "radarr" else SonarrClient
+                new_client = ClientClass(
+                    base_url=new_cfg.url,
+                    api_key=new_cfg.api_key.get_secret_value(),
+                )
+                setattr(request.app.state, f"{name}_client", new_client)
+
+            if existing_job:
+                # Reschedule with new interval
+                scheduler.reschedule_job(
+                    job_id,
+                    trigger="interval",
+                    minutes=new_cfg.search_interval,
+                )
+            else:
+                # Add new job for newly-enabled app
+                job_fn = make_search_job(request.app, name, state_path)
+                scheduler.add_job(
+                    job_fn,
+                    "interval",
+                    minutes=new_cfg.search_interval,
+                    id=job_id,
+                    next_run_time=datetime.now(timezone.utc),
+                )
+                logger.info(
+                    "Enabled {name} search every {interval}m",
+                    name=name.title(),
+                    interval=new_cfg.search_interval,
+                )
+
+    return RedirectResponse(url="/settings", status_code=303)
+
+
+@router.post("/api/search-now/{app_name}", response_class=HTMLResponse)
+async def search_now(request: Request, app_name: str) -> HTMLResponse:
+    """Trigger an immediate search cycle for the given app and return updated card."""
+    if app_name not in ("radarr", "sonarr"):
+        return HTMLResponse("Invalid app", status_code=400)
+
+    client = getattr(request.app.state, f"{app_name}_client", None)
+    if client is None:
+        return HTMLResponse("App not enabled", status_code=400)
+
+    cycle_fn = run_radarr_cycle if app_name == "radarr" else run_sonarr_cycle
+    try:
+        request.app.state.fetcharr_state = await cycle_fn(
+            client,
+            request.app.state.fetcharr_state,
+            request.app.state.settings,
+        )
+        save_state(
+            request.app.state.fetcharr_state,
+            request.app.state.state_path,
+        )
+        logger.info("{name}: Manual search triggered", name=app_name.title())
+    except Exception as exc:
+        logger.error(
+            "{name}: Manual search failed -- {exc}",
+            name=app_name.title(),
+            exc=exc,
+        )
+
+    # Return updated card partial
+    app_data = _build_app_context(request, app_name)
+    return templates.TemplateResponse(
+        request=request,
+        name="partials/app_card.html",
+        context={"app": app_data},
     )
 
 

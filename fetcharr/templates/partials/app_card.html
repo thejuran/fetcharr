@@ -41,6 +41,14 @@
     </div>
   </div>
 
-  <!-- Placeholder for Plan 03 controls (enable/disable toggle, Search Now button) -->
-  <div></div>
+  <!-- Controls -->
+  <div class="flex items-center gap-3 mt-4 pt-3 border-t border-fetcharr-border/50">
+      <button hx-post="/api/search-now/{{ app.name }}"
+              hx-target="#{{ app.name }}-card"
+              hx-swap="outerHTML"
+              class="bg-fetcharr-green/20 text-fetcharr-green text-xs font-medium px-3 py-1.5 rounded
+                     hover:bg-fetcharr-green/30 transition-colors">
+          Search Now
+      </button>
+  </div>
 </div>

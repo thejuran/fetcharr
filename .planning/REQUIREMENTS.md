@@ -25,7 +25,7 @@ Requirements for v1.2 Polish & Harden. Each maps to roadmap phases.
 
 ### CI/CD
 
-- [ ] **CICD-04**: CI workflow pushed to GitHub and tests pass on remote runners
+- [x] **CICD-04**: CI workflow pushed to GitHub and tests pass on remote runners
 
 ## Future Requirements
 
@@ -64,7 +64,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WEBU-09 | Phase 14 | Pending |
 | WEBU-10 | Phase 14 | Pending |
 | WEBU-11 | Phase 14 | Pending |
-| CICD-04 | Phase 13 | Pending |
+| CICD-04 | Phase 13 | Complete |
 
 **Coverage:**
 - v1.2 requirements: 8 total

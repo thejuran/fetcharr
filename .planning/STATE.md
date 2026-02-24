@@ -10,24 +10,24 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 13 (first of 4 in v1.2)
-Plan: Not yet planned
-Status: Ready to plan
-Last activity: 2026-02-24 -- Roadmap created for v1.2 Polish & Harden
+Plan: 1 of 2 in Phase 13 complete
+Status: Executing
+Last activity: 2026-02-24 -- Completed 13-01 (CI Caching)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 10%
 
 ## Performance Metrics
 
 **Overall:**
 - Total plans completed: 23 (v1.0: 18, v1.1: 5)
 - Milestones shipped: 2 (v1.0, v1.1)
-- v1.2 plans completed: 0
+- v1.2 plans completed: 1
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 13-ci-search-diagnostics | 1 | 2min | 2min |
 
 *Updated after each plan completion*
 
@@ -36,6 +36,9 @@ Progress: [░░░░░░░░░░] 0%
 ### Decisions
 
 Full decision log in PROJECT.md Key Decisions table.
+
+- [13-01] Used actions/cache@v4 with pyproject.toml hash key for uv cache
+- [13-01] Switched docker job to docker/build-push-action@v6 with GHA cache backend
 
 ### Pending Todos
 
@@ -49,5 +52,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Roadmap created for v1.2 -- ready to plan Phase 13
+Stopped at: Completed 13-01-PLAN.md (CI Caching)
 Resume file: None

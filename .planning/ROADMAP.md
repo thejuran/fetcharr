@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Config, state, and API clients with security invariants established
 - [x] **Phase 2: Search Engine** - Scheduler, round-robin, and cycle logic — the core product
-- [ ] **Phase 3: Web UI** - Status dashboard and config editor backed by real state data
+- [x] **Phase 3: Web UI** - Status dashboard and config editor backed by real state data
 - [ ] **Phase 4: Docker** - Multi-stage packaging and release-ready artifact
 
 ## Phase Details
@@ -64,12 +64,12 @@ Plans:
   4. User can view and edit all settings (URLs, intervals, batch sizes, per-app enable/disable) via a web form and save without editing any file on disk
   5. User can trigger an immediate search cycle for a specific app via a "search now" button in the UI
   6. The config editor never displays API key values — placeholders are shown instead, and keys are only accepted on write
-**Plans**: TBD
+**Plans**: 3/3 plans complete
 
 Plans:
-- [ ] 03-01: FastAPI routes and Jinja2 base templates, htmx polling for status dashboard
-- [ ] 03-02: Dashboard panels (last run, next run, queue position, item counts, connection status, search log)
-- [ ] 03-03: Config editor form (GET with masked keys, POST with PRG pattern, per-app enable/disable toggle, search-now trigger)
+- [x] 03-01-PLAN.md — FastAPI routes and Jinja2 base templates, htmx polling for status dashboard
+- [x] 03-02-PLAN.md — Dashboard panels (last run, next run, queue position, item counts, connection status, search log)
+- [x] 03-03-PLAN.md — Config editor form (GET with masked keys, POST with PRG pattern, per-app enable/disable toggle, search-now trigger)
 
 ### Phase 4: Docker
 **Goal**: Fetcharr runs as a Docker container that any self-hoster can pull and run with docker-compose, with config and state on a volume and no credentials baked into the image
@@ -94,5 +94,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-02-23 |
 | 2. Search Engine | 3/3 | Complete    | 2026-02-24 |
-| 3. Web UI | 0/3 | Not started | - |
+| 3. Web UI | 3/3 | Complete | 2026-02-24 |
 | 4. Docker | 0/1 | Not started | - |

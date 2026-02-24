@@ -7,6 +7,7 @@ and partial endpoints for htmx fragment updates.
 
 from __future__ import annotations
 
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -22,6 +23,7 @@ from fetcharr.config import load_settings
 from fetcharr.search.engine import run_radarr_cycle, run_sonarr_cycle
 from fetcharr.search.scheduler import make_search_job
 from fetcharr.state import save_state
+from fetcharr.web.validation import safe_int, safe_log_level, validate_arr_url
 
 _PKG_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = _PKG_DIR / "templates"
@@ -128,24 +130,33 @@ async def save_settings(request: Request) -> RedirectResponse:
     # Build new config dict from form data
     new_config: dict = {
         "general": {
-            "log_level": form.get("log_level", "info"),
+            "log_level": safe_log_level(form.get("log_level")),
         },
     }
 
     for name in ("radarr", "sonarr"):
         current_cfg = getattr(current_settings, name)
         submitted_key = form.get(f"{name}_api_key", "").strip()
+
+        # Validate URL before accepting it
+        url = form.get(f"{name}_url", "").strip()
+        valid, err = validate_arr_url(url)
+        if not valid:
+            logger.warning("{name}: URL rejected -- {err}", name=name.title(), err=err)
+            return RedirectResponse(url="/settings", status_code=303)
+
         new_config[name] = {
-            "url": form.get(f"{name}_url", "").strip(),
+            "url": url,
             "api_key": submitted_key if submitted_key else current_cfg.api_key.get_secret_value(),
             "enabled": form.get(f"{name}_enabled") == "on",
-            "search_interval": int(form.get(f"{name}_search_interval", 30)),
-            "search_missing_count": int(form.get(f"{name}_search_missing_count", 5)),
-            "search_cutoff_count": int(form.get(f"{name}_search_cutoff_count", 5)),
+            "search_interval": safe_int(form.get(f"{name}_search_interval"), 30, 1, 1440),
+            "search_missing_count": safe_int(form.get(f"{name}_search_missing_count"), 5, 1, 100),
+            "search_cutoff_count": safe_int(form.get(f"{name}_search_cutoff_count"), 5, 1, 100),
         }
 
     # Write TOML and reload settings
     config_path.write_text(tomli_w.dumps(new_config))
+    os.chmod(config_path, 0o600)
     new_settings = load_settings(config_path)
     request.app.state.settings = new_settings
 

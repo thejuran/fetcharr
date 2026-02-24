@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import sys
 import tomllib
 from pathlib import Path
@@ -62,6 +63,7 @@ def generate_default_config(config_path: Path) -> None:
     """
     config_path.parent.mkdir(parents=True, exist_ok=True)
     config_path.write_text(DEFAULT_CONFIG)
+    os.chmod(config_path, 0o600)
 
 
 def ensure_config(config_path: Path) -> Settings:

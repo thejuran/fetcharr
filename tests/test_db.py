@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import aiosqlite
 
-from fetcharr.db import get_recent_searches, init_db, insert_search_entry, migrate_from_state
+from fetcharr.db import get_recent_searches, get_search_history, init_db, insert_search_entry, migrate_from_state
 
 
 async def test_init_db_creates_table(tmp_path):
@@ -169,3 +169,143 @@ async def test_migration_preserves_existing_rows(tmp_path):
     assert results[0]["name"] == "Show Z"
     # Entry inserted after migration has outcome populated
     assert results[0]["outcome"] == "searched"
+
+
+# ---------------------------------------------------------------------------
+# Search history filtering and pagination tests (SRCH-14)
+# ---------------------------------------------------------------------------
+
+
+async def test_get_search_history_default_returns_all(tmp_path):
+    """get_search_history with no filters returns all entries, newest-first."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    await insert_search_entry(db_path, "Radarr", "missing", "Movie A")
+    await insert_search_entry(db_path, "Sonarr", "cutoff", "Show B")
+    await insert_search_entry(db_path, "Radarr", "missing", "Movie C", outcome="failed")
+
+    result = await get_search_history(db_path)
+    assert result["total"] == 3
+    assert result["page"] == 1
+    assert result["per_page"] == 50
+    assert result["total_pages"] == 1
+    assert len(result["entries"]) == 3
+    # Newest first (by id DESC)
+    assert result["entries"][0]["name"] == "Movie C"
+    assert result["entries"][1]["name"] == "Show B"
+    assert result["entries"][2]["name"] == "Movie A"
+
+
+async def test_get_search_history_filter_by_app(tmp_path):
+    """get_search_history with app_filter returns only matching app entries."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    await insert_search_entry(db_path, "Radarr", "missing", "Movie A")
+    await insert_search_entry(db_path, "Radarr", "cutoff", "Movie B")
+    await insert_search_entry(db_path, "Sonarr", "missing", "Show C")
+
+    result = await get_search_history(db_path, app_filter=["Radarr"])
+    assert result["total"] == 2
+    assert all(e["app"] == "Radarr" for e in result["entries"])
+
+
+async def test_get_search_history_filter_by_queue_type(tmp_path):
+    """get_search_history with queue_filter returns only matching queue type entries."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    await insert_search_entry(db_path, "Radarr", "missing", "Movie A")
+    await insert_search_entry(db_path, "Radarr", "cutoff", "Movie B")
+    await insert_search_entry(db_path, "Sonarr", "cutoff", "Show C")
+
+    result = await get_search_history(db_path, queue_filter=["cutoff"])
+    assert result["total"] == 2
+    assert all(e["queue_type"] == "cutoff" for e in result["entries"])
+
+
+async def test_get_search_history_filter_by_outcome(tmp_path):
+    """get_search_history with outcome_filter returns only matching outcome entries."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    await insert_search_entry(db_path, "Radarr", "missing", "Movie A", outcome="searched")
+    await insert_search_entry(db_path, "Radarr", "missing", "Movie B", outcome="failed")
+    await insert_search_entry(db_path, "Sonarr", "cutoff", "Show C", outcome="failed")
+
+    result = await get_search_history(db_path, outcome_filter=["failed"])
+    assert result["total"] == 2
+    assert all(e["outcome"] == "failed" for e in result["entries"])
+
+
+async def test_get_search_history_text_search(tmp_path):
+    """get_search_history with search_text filters by case-insensitive substring."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    await insert_search_entry(db_path, "Radarr", "missing", "The Matrix")
+    await insert_search_entry(db_path, "Radarr", "missing", "Matrix Reloaded")
+    await insert_search_entry(db_path, "Radarr", "missing", "Inception")
+
+    result = await get_search_history(db_path, search_text="matrix")
+    assert result["total"] == 2
+
+
+async def test_get_search_history_combined_filters(tmp_path):
+    """get_search_history with multiple filters returns entries matching ALL filters."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    await insert_search_entry(db_path, "Radarr", "missing", "Movie A")
+    await insert_search_entry(db_path, "Radarr", "cutoff", "Movie B")
+    await insert_search_entry(db_path, "Sonarr", "missing", "Show C")
+    await insert_search_entry(db_path, "Sonarr", "cutoff", "Show D")
+
+    result = await get_search_history(db_path, app_filter=["Radarr"], queue_filter=["missing"])
+    assert result["total"] == 1
+    assert result["entries"][0]["name"] == "Movie A"
+    assert result["entries"][0]["app"] == "Radarr"
+    assert result["entries"][0]["queue_type"] == "missing"
+
+
+async def test_get_search_history_pagination(tmp_path):
+    """get_search_history paginates correctly across multiple pages."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    for i in range(75):
+        await insert_search_entry(db_path, "Radarr", "missing", f"Movie {i}")
+
+    # Page 1
+    result = await get_search_history(db_path, page=1)
+    assert len(result["entries"]) == 50
+    assert result["total"] == 75
+    assert result["total_pages"] == 2
+
+    # Page 2
+    result2 = await get_search_history(db_path, page=2)
+    assert len(result2["entries"]) == 25
+
+
+async def test_get_search_history_empty_db(tmp_path):
+    """get_search_history on empty database returns zero entries and total_pages == 1."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    result = await get_search_history(db_path)
+    assert result["total"] == 0
+    assert result["entries"] == []
+    assert result["total_pages"] == 1
+
+
+async def test_get_search_history_entries_have_id(tmp_path):
+    """get_search_history entries include 'id' key."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    await insert_search_entry(db_path, "Radarr", "missing", "Movie A")
+
+    result = await get_search_history(db_path)
+    assert len(result["entries"]) == 1
+    assert "id" in result["entries"][0]

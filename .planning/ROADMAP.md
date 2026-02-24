@@ -83,10 +83,11 @@ Plans:
   1. User can navigate to a search history page from the dashboard
   2. User can filter search history by app (Radarr/Sonarr) and queue type (missing/cutoff)
   3. Search history displays with pagination so large histories remain navigable
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 15-01: TBD
+- [ ] 15-01-PLAN.md -- Backend query with filtering/pagination, history page template, nav link, htmx partial
+- [ ] 15-02-PLAN.md -- Tests for search history query, route, and template rendering
 
 ### Phase 16: Sonarr Episode Fallback
 **Goal**: Sonarr searches recover automatically when season-level search fails by retrying at episode granularity
@@ -122,5 +123,5 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16
 | 12. Documentation | v1.1 | 1/1 | Complete | 2026-02-24 |
 | 13. CI & Search Diagnostics | 2/2 | Complete    | 2026-02-24 | - |
 | 14. Dashboard Observability | 2/2 | Complete    | 2026-02-24 | - |
-| 15. Search History UI | v1.2 | 0/TBD | Not started | - |
+| 15. Search History UI | v1.2 | 0/2 | Not started | - |
 | 16. Sonarr Episode Fallback | v1.2 | 0/TBD | Not started | - |

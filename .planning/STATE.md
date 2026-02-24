@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible media on a schedule, without exposing credentials or expanding attack surface.
-**Current focus:** Phase 2 — Search Engine
+**Current focus:** Phase 3 — Web UI
 
 ## Current Position
 
-Phase: 2 of 4 (Search Engine)
-Plan: 3 of 3 in current phase
-Status: Phase Complete
-Last activity: 2026-02-23 — Completed 02-03-PLAN.md (APScheduler integration, search engine tests)
+Phase: 3 of 4 (Web UI)
+Plan: 1 of 3 in current phase
+Status: In Progress
+Last activity: 2026-02-23 — Completed 03-01-PLAN.md (Web UI infrastructure)
 
-Progress: [████████████████████░░░░░░░░] 60%
+Progress: [███████████████████████░░░░░] 70%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: 2min
-- Total execution time: 14min
+- Total execution time: 17min
 
 **By Phase:**
 
@@ -29,9 +29,10 @@ Progress: [████████████████████░░░
 |-------|-------|-------|----------|
 | 1. Foundation | 3/3 | 8min | 3min |
 | 2. Search Engine | 3/3 | 6min | 2min |
+| 3. Web UI | 1/3 | 3min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (2min), 01-03 (2min), 02-01 (2min), 02-02 (2min), 02-03 (2min)
+- Last 5 plans: 01-03 (2min), 02-01 (2min), 02-02 (2min), 02-03 (2min), 03-01 (3min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -63,6 +64,9 @@ Recent decisions affecting current work:
 - [02-03]: APScheduler 3.x chosen over 4.x (4.x still alpha, 3.x stable with AsyncIOScheduler)
 - [02-03]: Uvicorn log_level=warning to keep loguru as sole log channel
 - [02-03]: State shared by reference via nonlocal in job closures (safe: same event loop)
+- [03-01]: Tailwind CSS v4 compiled via pytailwindcss (v4.2.1 binary auto-downloaded)
+- [03-01]: Job closures read from app.state at execution time for hot-reload readiness
+- [03-01]: Active nav link uses Jinja2 block overrides instead of URL comparison
 
 ### Pending Todos
 
@@ -76,5 +80,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Completed 02-03-PLAN.md (Phase 2 complete)
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None

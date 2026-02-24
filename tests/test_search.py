@@ -3,17 +3,19 @@
 Tests cover: filtering (monitored, air dates), batch slicing (normal,
 wrap, empty, past-end cursor), deduplication (collapse, order, display
 name, fallback), Sonarr-specific filtering (unmonitored, future, null,
-past, malformed), and async cycle orchestration (happy path, network
+past, malformed), async cycle orchestration (happy path, network
 failure, per-item skip, cursor advancement) for both run_radarr_cycle
-and run_sonarr_cycle.
+and run_sonarr_cycle, and per-cycle diagnostic summary logging.
 """
 
 from __future__ import annotations
 
+import io
 from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock
 
 import httpx
+from loguru import logger
 
 from fetcharr.db import init_db
 from fetcharr.search.engine import (
@@ -495,3 +497,116 @@ def test_cap_batch_sizes_very_small_max():
     assert cap_batch_sizes(5, 5, 1) == (0, 1)
     # 1+1=2 > 1 -> missing gets floor(1*1/2)=0, cutoff gets 1-0=1
     assert cap_batch_sizes(1, 1, 1) == (0, 1)
+
+
+# ---------------------------------------------------------------------------
+# Diagnostic cycle logging
+# ---------------------------------------------------------------------------
+
+
+async def test_radarr_cycle_logs_diagnostic_summary(tmp_path):
+    """Radarr cycle logs a summary with fetched/searched/skipped counts."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    client = AsyncMock()
+    client.get_wanted_missing = AsyncMock(
+        return_value=[
+            {"id": 1, "title": "Movie A", "monitored": True},
+            {"id": 2, "title": "Movie B", "monitored": True},
+            {"id": 3, "title": "Movie C", "monitored": True},
+        ]
+    )
+    client.get_wanted_cutoff = AsyncMock(
+        return_value=[
+            {"id": 4, "title": "Movie D", "monitored": True},
+            {"id": 5, "title": "Movie E", "monitored": True},
+        ]
+    )
+    client.search_movies = AsyncMock()
+
+    state = _default_state()
+    settings = _cycle_settings(missing_count=5, cutoff_count=5)
+
+    sink = io.StringIO()
+    handler_id = logger.add(sink, format="{message}", level="INFO")
+    try:
+        await run_radarr_cycle(client, state, settings, db_path)
+    finally:
+        logger.remove(handler_id)
+
+    output = sink.getvalue()
+    assert "Radarr: Cycle completed in" in output
+    assert "5 fetched" in output
+    assert "5 searched" in output
+    assert "0 skipped" in output
+
+
+async def test_sonarr_cycle_logs_diagnostic_summary(tmp_path):
+    """Sonarr cycle logs a summary with fetched/searched/skipped counts."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    episodes = [
+        _make_sonarr_episode(series_id=10, season_number=1, series_title="Show A", episode_id=100),
+        _make_sonarr_episode(series_id=10, season_number=2, series_title="Show A", episode_id=101),
+        _make_sonarr_episode(series_id=20, season_number=1, series_title="Show B", episode_id=200),
+    ]
+
+    client = AsyncMock()
+    client.get_wanted_missing = AsyncMock(return_value=episodes)
+    client.get_wanted_cutoff = AsyncMock(return_value=[])
+    client.search_season = AsyncMock()
+
+    state = _default_state()
+    settings = _cycle_settings(missing_count=5, cutoff_count=5)
+
+    sink = io.StringIO()
+    handler_id = logger.add(sink, format="{message}", level="INFO")
+    try:
+        await run_sonarr_cycle(client, state, settings, db_path)
+    finally:
+        logger.remove(handler_id)
+
+    output = sink.getvalue()
+    assert "Sonarr: Cycle completed in" in output
+    # 3 episodes fetched (raw count before filtering/dedup)
+    assert "3 fetched" in output
+    assert "searched" in output
+    assert "skipped" in output
+
+
+async def test_radarr_cycle_counts_skipped_on_search_failure(tmp_path):
+    """Radarr cycle diagnostic summary correctly counts skipped items."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    client = AsyncMock()
+    client.get_wanted_missing = AsyncMock(
+        return_value=[
+            {"id": 1, "title": "Movie A", "monitored": True},
+            {"id": 2, "title": "Movie B", "monitored": True},
+            {"id": 3, "title": "Movie C", "monitored": True},
+        ]
+    )
+    client.get_wanted_cutoff = AsyncMock(return_value=[])
+    # First search fails, second and third succeed
+    client.search_movies = AsyncMock(
+        side_effect=[Exception("boom"), None, None]
+    )
+
+    state = _default_state()
+    settings = _cycle_settings(missing_count=5, cutoff_count=5)
+
+    sink = io.StringIO()
+    handler_id = logger.add(sink, format="{message}", level="INFO")
+    try:
+        await run_radarr_cycle(client, state, settings, db_path)
+    finally:
+        logger.remove(handler_id)
+
+    output = sink.getvalue()
+    assert "Radarr: Cycle completed in" in output
+    assert "3 fetched" in output
+    assert "2 searched" in output
+    assert "1 skipped" in output

@@ -69,11 +69,11 @@ Plans:
   1. Dashboard position labels display "X of Y" format (e.g., "3 of 47") instead of bare cursor numbers
   2. A dedicated section in the dashboard shows recent application log messages from loguru
   3. Search log entries display outcome/detail information (e.g., search triggered, error encountered) alongside item name and timestamp
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 14-01: TBD
-- [ ] 14-02: TBD
+- [ ] 14-01-PLAN.md -- Position labels ("X of Y") and search log outcome/detail
+- [ ] 14-02-PLAN.md -- Application log viewer section with loguru ring buffer
 
 ### Phase 15: Search History UI
 **Goal**: Users can browse and filter their complete search history beyond the dashboard's recent log

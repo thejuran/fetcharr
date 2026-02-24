@@ -1,0 +1,81 @@
+# Requirements: Fetcharr
+
+**Defined:** 2026-02-24
+**Core Value:** Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible media on a schedule, without exposing credentials or expanding attack surface.
+
+## v1.1 Requirements
+
+Requirements for Ship & Document release. Each maps to roadmap phases.
+
+### Documentation
+
+- [ ] **DOCS-01**: README has install instructions (Docker pull + docker-compose example)
+- [ ] **DOCS-02**: README documents all config options (TOML fields, defaults, valid ranges)
+- [ ] **DOCS-03**: README explains security model (what's protected, what's not, why no auth)
+- [ ] **DOCS-04**: README includes screenshots of dashboard and config editor
+
+### CI/CD
+
+- [ ] **CICD-01**: GitHub Actions runs pytest on every PR and push to main
+- [ ] **CICD-02**: GitHub Actions runs linting (ruff) on every PR and push to main
+- [ ] **CICD-03**: GitHub Actions validates Docker build on every PR
+
+### Release Pipeline
+
+- [ ] **RELS-01**: Push to main builds and pushes ghcr.io/thejuran/fetcharr:dev
+- [ ] **RELS-02**: Git tag push builds and pushes ghcr.io/thejuran/fetcharr:latest + version tag
+- [ ] **RELS-03**: CLAUDE.md documents deep code review convention (offer /deep-review before push)
+
+### Search Features
+
+- [ ] **SRCH-12**: User can set a hard max items per cycle that overrides per-app counts
+- [ ] **SRCH-13**: Search history persisted to SQLite (survives container restart, queryable)
+
+## v2 Requirements
+
+Deferred to future release. Tracked but not in current roadmap.
+
+### Extended Search
+
+- **SRCH-14**: Search history UI with filtering and pagination (beyond current bounded log)
+
+## Out of Scope
+
+Explicitly excluded. Documented to prevent scope creep.
+
+| Feature | Reason |
+|---------|--------|
+| User accounts / authentication | No auth = no passwords = no credential attack surface |
+| Lidarr / Readarr / other *arr support | Radarr + Sonarr cover the primary use case |
+| Multi-instance support | Single Radarr + single Sonarr matches user's setup |
+| Notifications (Discord, Telegram, Apprise) | Web UI log sufficient |
+| Prowlarr integration / indexer stats | Out of search automation scope |
+| Docker Hub | Using ghcr.io for consistency with other projects |
+| Automated changelog generation | Manual release notes sufficient for now |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| DOCS-01 | — | Pending |
+| DOCS-02 | — | Pending |
+| DOCS-03 | — | Pending |
+| DOCS-04 | — | Pending |
+| CICD-01 | — | Pending |
+| CICD-02 | — | Pending |
+| CICD-03 | — | Pending |
+| RELS-01 | — | Pending |
+| RELS-02 | — | Pending |
+| RELS-03 | — | Pending |
+| SRCH-12 | — | Pending |
+| SRCH-13 | — | Pending |
+
+**Coverage:**
+- v1.1 requirements: 12 total
+- Mapped to phases: 0
+- Unmapped: 12
+
+---
+*Requirements defined: 2026-02-24*

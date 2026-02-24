@@ -168,4 +168,7 @@ Plans:
   2. `settings.html` form action uses `url_for("save_settings")` instead of hardcoded `/settings`
   3. `POST /api/search-now/{app}` has a happy-path test with `search_lock` in the fixture
   4. All 17 SUMMARY.md files include `requirements-completed` frontmatter field
-**Plans:** TBD
+**Plans:** 1 plan
+
+Plans:
+- [ ] 08-01-PLAN.md — Dead code removal, template url_for fix, search_now test, audit verification

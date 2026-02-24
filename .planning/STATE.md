@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible media on a schedule, without exposing credentials or expanding attack surface.
-**Current focus:** Phase 6 — Bug Fixes & Resilience (In Progress)
+**Current focus:** Phase 7 — Test Coverage (In Progress)
 
 ## Current Position
 
-Phase: 6 of 7 (Bug Fixes & Resilience)
-Plan: 3 of 3 in current phase (COMPLETE)
-Status: Phase Complete
-Last activity: 2026-02-24 — Completed 06-03 (Concurrency lock, settings validation, traceback redaction)
+Phase: 7 of 7 (Test Coverage)
+Plan: 1 of 2 in current phase
+Status: In Progress
+Last activity: 2026-02-24 — Completed 07-01 (ArrClient base method tests)
 
-Progress: [█████████████████████████░░░░░] 86% (6/7 phases)
+Progress: [███████████████████████████░░░] 93% (16/17 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
+- Total plans completed: 16
 - Average duration: 2min
-- Total execution time: 34min
+- Total execution time: 36min
 
 **By Phase:**
 
@@ -33,9 +33,10 @@ Progress: [███████████████████████
 | 4. Docker | 1/1 | 2min | 2min |
 | 5. Security Hardening | 2/2 | 4min | 2min |
 | 6. Bug Fixes & Resilience | 3/3 | 6min | 2min |
+| 7. Test Coverage | 1/2 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 05-01 (2min), 05-02 (2min), 06-01 (2min), 06-02 (2min), 06-03 (2min)
+- Last 5 plans: 05-02 (2min), 06-01 (2min), 06-02 (2min), 06-03 (2min), 07-01 (2min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -96,6 +97,8 @@ Recent decisions affecting current work:
 - [06-03]: asyncio.Lock on app.state.search_lock serializes scheduler and manual search-now cycles
 - [06-03]: Settings validated via SettingsModel(**new_config) before disk write -- invalid config never persisted
 - [06-03]: Log redaction refreshed after settings save to pick up changed API keys
+- [07-01]: MockTransport AsyncClient requires base_url to resolve relative paths for cookie extraction
+- [07-01]: conftest.py uses plain factory functions (not fixtures) for reusable test helpers
 
 ### Roadmap Evolution
 
@@ -115,5 +118,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 06-03-PLAN.md
+Stopped at: Completed 07-01-PLAN.md
 Resume file: None

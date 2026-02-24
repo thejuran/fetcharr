@@ -60,7 +60,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **QUAL-04**: State file load fills missing keys from defaults for forward-compatible schema migration
 - [x] **QUAL-05**: Log redaction covers exception tracebacks; settings hot-reload refreshes redaction filter
 - [x] **QUAL-06**: All API response parsing handles ValidationError gracefully; httpx retry covers RemoteProtocolError
-- [ ] **QUAL-07**: All async code paths (clients, cycles, scheduler, startup) have test coverage
+- [x] **QUAL-07**: All async code paths (clients, cycles, scheduler, startup) have test coverage
 
 ### Deployment
 

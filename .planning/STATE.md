@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible media on a schedule, without exposing credentials or expanding attack surface.
-**Current focus:** Phase 5 — Security Hardening (Complete)
+**Current focus:** Phase 6 — Bug Fixes & Resilience (In Progress)
 
 ## Current Position
 
-Phase: 5 of 7 (Security Hardening)
-Plan: 2 of 2 in current phase
-Status: Phase Complete
-Last activity: 2026-02-24 — Completed 05-02 (Input validation, config permissions hardening)
+Phase: 6 of 7 (Bug Fixes & Resilience)
+Plan: 2 of 3 in current phase
+Status: In Progress
+Last activity: 2026-02-24 — Completed 06-02 (Exception hierarchy and API resilience)
 
 Progress: [█████████████████████░░░░░░░░░] 71% (5/7 phases)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
+- Total plans completed: 14
 - Average duration: 2min
-- Total execution time: 28min
+- Total execution time: 32min
 
 **By Phase:**
 
@@ -32,9 +32,10 @@ Progress: [█████████████████████░░
 | 3. Web UI | 3/3 | 8min | 3min |
 | 4. Docker | 1/1 | 2min | 2min |
 | 5. Security Hardening | 2/2 | 4min | 2min |
+| 6. Bug Fixes & Resilience | 2/3 | 4min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 03-02 (2min), 03-03 (3min), 04-01 (2min), 05-01 (2min), 05-02 (2min)
+- Last 5 plans: 04-01 (2min), 05-01 (2min), 05-02 (2min), 06-01 (2min), 06-02 (2min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -85,6 +86,11 @@ Recent decisions affecting current work:
 - [05-02]: Empty URL is valid (app disabled state) -- not rejected by validation
 - [05-02]: Private-network IPs (10.x, 192.168.x) intentionally allowed since *arr apps run on LAN
 - [05-02]: Invalid URL redirects back to /settings with no flash message (acceptable for security hardening pass)
+- [06-01]: Shallow merge per app key preserves loaded values while filling missing keys from defaults
+- [06-01]: Type-checked merge: only merge dicts for app keys, only replace search_log with lists
+- [06-02]: TransportError replaces ConnectError+TimeoutException in retry catch (covers RemoteProtocolError, ReadError)
+- [06-02]: httpx.HTTPError replaces redundant subcatches in cycle abort handlers
+- [06-02]: ValidationError added to cycle abort catches for get_paginated model_validate failures
 
 ### Roadmap Evolution
 
@@ -104,5 +110,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 05-02-PLAN.md
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None

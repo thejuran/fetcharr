@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 16 (fourth of 4 in v1.2)
-Plan: 1 of 2 in Phase 16
-Status: Plan 01 complete (warning fixes + regression tests)
-Last activity: 2026-02-24 -- Completed 16-01 warning fixes (W1 XSS, W4 cursors, W5 zero-div, W7 SSRF)
+Plan: 2 of 2 in Phase 16
+Status: Phase 16 complete (all warning fixes + review resolution tracking)
+Last activity: 2026-02-24 -- Completed 16-02 routes fixes + review resolution status
 
-Progress: [█████████░] 90%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Overall:**
-- Total plans completed: 29 (v1.0: 18, v1.1: 5, v1.2: 6)
+- Total plans completed: 30 (v1.0: 18, v1.1: 5, v1.2: 7)
 - Milestones shipped: 2 (v1.0, v1.1)
-- v1.2 plans completed: 7
+- v1.2 plans completed: 8
 
 **By Phase:**
 
@@ -30,7 +30,7 @@ Progress: [█████████░] 90%
 | 13-ci-search-diagnostics | 2 | 6min | 3min |
 | 14-dashboard-observability | 2 | 6min | 3min |
 | 15-search-history-ui | 2 | 3min | 1.5min |
-| 16-deep-code-review | 1 | 3min | 3min |
+| 16-deep-code-review | 2 | 5min | 2.5min |
 
 *Updated after each plan completion*
 
@@ -56,6 +56,7 @@ Full decision log in PROJECT.md Key Decisions table.
 - [15-02] Nav link active class verified by extracting full <a> tag from rendered HTML
 - [16-01] Used is_unspecified (not just is_loopback) to block 0.0.0.0 -- Python ipaddress classifies it as unspecified
 - [16-01] Changed SSRF error message to generic "Blocked address" covering loopback, unspecified, and link-local
+- [16-02] Used same atomic write pattern as state.py (tempfile + fsync + os.replace) for config consistency
 
 ### Pending Todos
 
@@ -69,5 +70,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 16-01-PLAN.md (warning fixes + regression tests)
+Stopped at: Completed 16-02-PLAN.md (routes fixes + review resolution). Phase 16 complete. v1.2 milestone complete.
 Resume file: None

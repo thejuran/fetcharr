@@ -59,23 +59,23 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DOCS-01 | — | Pending |
-| DOCS-02 | — | Pending |
-| DOCS-03 | — | Pending |
-| DOCS-04 | — | Pending |
-| CICD-01 | — | Pending |
-| CICD-02 | — | Pending |
-| CICD-03 | — | Pending |
-| RELS-01 | — | Pending |
-| RELS-02 | — | Pending |
-| RELS-03 | — | Pending |
-| SRCH-12 | — | Pending |
-| SRCH-13 | — | Pending |
+| DOCS-01 | Phase 12 | Pending |
+| DOCS-02 | Phase 12 | Pending |
+| DOCS-03 | Phase 12 | Pending |
+| DOCS-04 | Phase 12 | Pending |
+| CICD-01 | Phase 9 | Pending |
+| CICD-02 | Phase 9 | Pending |
+| CICD-03 | Phase 9 | Pending |
+| RELS-01 | Phase 10 | Pending |
+| RELS-02 | Phase 10 | Pending |
+| RELS-03 | Phase 10 | Pending |
+| SRCH-12 | Phase 11 | Pending |
+| SRCH-13 | Phase 11 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 12 total
-- Mapped to phases: 0
-- Unmapped: 12
+- Mapped to phases: 12
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-24*

@@ -5,14 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible media on a schedule, without exposing credentials or expanding attack surface.
-**Current focus:** Milestone v1.1 — Ship & Document
+**Current focus:** Milestone v1.1 — Ship & Document (Phase 9: CI/CD Pipeline)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 9 of 12 (CI/CD Pipeline)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-02-24 — Milestone v1.1 started
+Status: Ready to plan
+Last activity: 2026-02-24 — Roadmap created for v1.1
+
+Progress: [██████████████████░░░░░░░░░░░░] 18/18 plans (v1.0) + 0/? (v1.1)
 
 ## Performance Metrics
 
@@ -39,5 +41,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Defining v1.1 requirements
+Stopped at: Roadmap created for v1.1 milestone
 Resume file: None

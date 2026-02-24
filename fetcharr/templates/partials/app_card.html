@@ -1,0 +1,26 @@
+<div id="{{ app.name }}-card"
+     hx-get="/partials/app-card/{{ app.name }}"
+     hx-trigger="every 5s"
+     hx-swap="outerHTML"
+     class="bg-fetcharr-card rounded-lg border border-fetcharr-border border-l-4 border-l-fetcharr-green p-5">
+  <h2 class="text-lg font-semibold mb-3">{{ app.name | capitalize }}</h2>
+  <div class="grid grid-cols-2 gap-3">
+    <div>
+      <span class="text-xs uppercase text-fetcharr-muted">Last Run</span>
+      <p class="text-sm">{% if app.last_run %}{{ app.last_run[:19] | replace("T", " ") }}{% else %}Never{% endif %}</p>
+    </div>
+    <div>
+      <span class="text-xs uppercase text-fetcharr-muted">Next Run</span>
+      <p class="text-sm">{% if app.next_run %}{{ app.next_run[:19] | replace("T", " ") }}{% else %}&mdash;{% endif %}</p>
+    </div>
+    <div>
+      <span class="text-xs uppercase text-fetcharr-muted">Missing Queue</span>
+      <p class="text-sm">Position {{ app.missing_cursor }}</p>
+    </div>
+    <div>
+      <span class="text-xs uppercase text-fetcharr-muted">Cutoff Queue</span>
+      <p class="text-sm">Position {{ app.cutoff_cursor }}</p>
+    </div>
+  </div>
+  <!-- Placeholder for future controls (Plan 02 adds counts/health, Plan 03 adds buttons) -->
+</div>

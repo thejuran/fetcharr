@@ -13,7 +13,7 @@ Fetcharr is a single-process automation daemon that cycles through Radarr and So
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Config, state, and API clients with security invariants established
-- [ ] **Phase 2: Search Engine** - Scheduler, round-robin, and cycle logic — the core product
+- [x] **Phase 2: Search Engine** - Scheduler, round-robin, and cycle logic — the core product
 - [ ] **Phase 3: Web UI** - Status dashboard and config editor backed by real state data
 - [ ] **Phase 4: Docker** - Multi-stage packaging and release-ready artifact
 
@@ -49,9 +49,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Config extension (search tuning fields), client search methods, and core engine utilities (filtering, batch slicing, search logging)
-- [ ] 02-02-PLAN.md — Radarr and Sonarr search cycle functions with round-robin cursors, episode-to-season deduplication, and skip-on-failure error handling
-- [ ] 02-03-PLAN.md — APScheduler integration via FastAPI lifespan, uvicorn entry point, state persistence per cycle, and search engine test suite
+- [x] 02-01-PLAN.md — Config extension (search tuning fields), client search methods, and core engine utilities (filtering, batch slicing, search logging)
+- [x] 02-02-PLAN.md — Radarr and Sonarr search cycle functions with round-robin cursors, episode-to-season deduplication, and skip-on-failure error handling
+- [x] 02-03-PLAN.md — APScheduler integration via FastAPI lifespan, uvicorn entry point, state persistence per cycle, and search engine test suite
 
 ### Phase 3: Web UI
 **Goal**: Users can view the current automation status, recent search history, and queue positions in a browser, and can edit all settings without touching config files
@@ -93,6 +93,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-02-23 |
-| 2. Search Engine | 1/3 | In Progress | - |
+| 2. Search Engine | 3/3 | Complete | 2026-02-23 |
 | 3. Web UI | 0/3 | Not started | - |
 | 4. Docker | 0/1 | Not started | - |

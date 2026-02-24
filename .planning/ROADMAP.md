@@ -42,7 +42,9 @@ Fetcharr is a single-process automation daemon that cycles through Radarr and So
   1. Pushing a commit to main or opening a PR triggers pytest and all 115+ tests pass
   2. Ruff linting runs on every PR and push to main, failing the build on violations
   3. Docker image builds successfully as part of CI (build validated, not pushed)
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 09-01-PLAN.md — Ruff config + GitHub Actions CI workflow (pytest, ruff, Docker build)
 
 ### Phase 10: Release Pipeline
 **Goal**: Docker images are automatically published on push and release, with a documented review convention
@@ -88,7 +90,7 @@ Fetcharr is a single-process automation daemon that cycles through Radarr and So
 | 6. Bug Fixes & Resilience | v1.0 | 3/3 | Complete | 2026-02-24 |
 | 7. Test Coverage | v1.0 | 2/2 | Complete | 2026-02-24 |
 | 8. Tech Debt Cleanup | v1.0 | 1/1 | Complete | 2026-02-24 |
-| 9. CI/CD Pipeline | v1.1 | 0/? | Not started | - |
+| 9. CI/CD Pipeline | v1.1 | 0/1 | In progress | - |
 | 10. Release Pipeline | v1.1 | 0/? | Not started | - |
 | 11. Search Enhancements | v1.1 | 0/? | Not started | - |
 | 12. Documentation | v1.1 | 0/? | Not started | - |

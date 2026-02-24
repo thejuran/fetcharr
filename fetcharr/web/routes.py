@@ -54,6 +54,10 @@ def _build_app_context(request: Request, app_name: str) -> dict | None:
         "next_run": next_run,
         "missing_cursor": app_state.get("missing_cursor", 0),
         "cutoff_cursor": app_state.get("cutoff_cursor", 0),
+        "connected": app_state.get("connected"),
+        "unreachable_since": app_state.get("unreachable_since"),
+        "missing_count": app_state.get("missing_count"),
+        "cutoff_count": app_state.get("cutoff_count"),
     }
 
 

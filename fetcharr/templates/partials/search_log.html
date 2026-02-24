@@ -3,37 +3,24 @@
      hx-trigger="every 5s"
      hx-swap="outerHTML"
      class="bg-fetcharr-card rounded-lg border border-fetcharr-border p-5">
-  <h2 class="text-lg font-semibold mb-3">Search Log</h2>
+  <h2 class="text-lg font-semibold mb-4">Search Log</h2>
   {% set entries = search_log[::-1][:20] %}
   {% if not entries %}
   <p class="text-fetcharr-muted text-sm">No searches yet.</p>
   {% else %}
-  <div class="overflow-x-auto">
-    <table class="w-full text-sm">
-      <thead>
-        <tr class="text-xs uppercase text-fetcharr-muted border-b border-fetcharr-border">
-          <th class="text-left pb-2 pr-3">App</th>
-          <th class="text-left pb-2 pr-3">Item</th>
-          <th class="text-left pb-2 pr-3">Queue</th>
-          <th class="text-left pb-2">Time</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for entry in entries %}
-        <tr class="border-b border-fetcharr-border/50">
-          <td class="py-1.5 pr-3">
-            <span class="inline-block px-1.5 py-0.5 text-xs rounded
-              {% if entry.app == 'Radarr' %}bg-blue-900/50 text-blue-300{% else %}bg-purple-900/50 text-purple-300{% endif %}">
-              {{ entry.app }}
-            </span>
-          </td>
-          <td class="py-1.5 pr-3">{{ entry.name }}</td>
-          <td class="py-1.5 pr-3 text-fetcharr-muted">{{ entry.queue_type }}</td>
-          <td class="py-1.5 text-fetcharr-muted text-xs">{{ entry.timestamp[:19] | replace("T", " ") }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="space-y-0">
+    {% for entry in entries %}
+    <div class="flex items-center gap-3 py-1.5 {% if not loop.last %}border-b border-fetcharr-border/50{% endif %}">
+        <span class="text-xs font-medium px-2 py-0.5 rounded
+               {% if entry.app == 'Radarr' %}bg-orange-500/20 text-orange-400
+               {% else %}bg-blue-500/20 text-blue-400{% endif %}">
+            {{ entry.app }}
+        </span>
+        <span class="text-sm flex-1 truncate">{{ entry.name }}</span>
+        <span class="text-xs text-fetcharr-muted">{{ entry.queue_type }}</span>
+        <span class="text-xs text-fetcharr-muted">{{ entry.timestamp[:19] | replace('T', ' ') }}</span>
+    </div>
+    {% endfor %}
   </div>
   {% endif %}
 </div>

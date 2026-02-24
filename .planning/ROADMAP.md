@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Web UI** - Status dashboard and config editor backed by real state data
 - [x] **Phase 4: Docker** - Multi-stage packaging and release-ready artifact
 - [x] **Phase 5: Security Hardening** - CSRF, SSRF, input validation, Docker hardening, and CDN removal (completed 2026-02-24)
-- [ ] **Phase 6: Bug Fixes & Resilience** - Race conditions, error handling, state recovery, and log redaction
+- [x] **Phase 6: Bug Fixes & Resilience** - Race conditions, error handling, state recovery, and log redaction (completed 2026-02-24)
 - [ ] **Phase 7: Test Coverage** - Async path tests for clients, cycles, scheduler, and startup
 
 ## Phase Details
@@ -100,7 +100,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. Web UI | 3/3 | Complete | 2026-02-24 |
 | 4. Docker | 1/1 | Complete | 2026-02-24 |
 | 5. Security Hardening | 1/2 | Complete    | 2026-02-24 |
-| 6. Bug Fixes & Resilience | 0/3 | Not Started | — |
+| 6. Bug Fixes & Resilience | 0/3 | Complete    | 2026-02-24 |
 | 7. Test Coverage | 0/? | Not Started | — |
 
 ### Phase 5: Security Hardening
@@ -132,7 +132,7 @@ Plans:
   4. State file load fills missing keys from defaults (schema migration) so older state files do not crash newer code
   5. Log redaction covers exception tracebacks, and settings hot-reload re-initializes the redaction filter with new API keys
   6. `validate_connection` and `get_paginated` catch `ValidationError` gracefully; `RemoteProtocolError` is retried; `deduplicate_to_seasons` handles missing fields; httpx exception hierarchy is correct
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 
 Plans:
 - [ ] 06-01-PLAN.md — State resilience: corrupt recovery, schema migration, temp file cleanup

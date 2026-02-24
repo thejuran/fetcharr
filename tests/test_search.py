@@ -270,12 +270,16 @@ async def test_run_radarr_cycle_per_item_skip(tmp_path):
 
     # Did not abort after first failure -- called twice
     assert client.search_movies.call_count == 2
-    # Only the successful search was logged to SQLite
+    # Both searches logged to SQLite (failed + succeeded)
     from fetcharr.db import get_recent_searches
 
     searches = await get_recent_searches(db_path)
-    assert len(searches) == 1
+    assert len(searches) == 2
+    # Newest first: Movie B (searched), Movie A (failed)
     assert searches[0]["name"] == "Movie B"
+    assert searches[0]["outcome"] == "searched"
+    assert searches[1]["name"] == "Movie A"
+    assert searches[1]["outcome"] == "failed"
 
 
 async def test_run_radarr_cycle_cursor_advancement(tmp_path):
@@ -411,12 +415,16 @@ async def test_run_sonarr_cycle_per_item_skip(tmp_path):
     await run_sonarr_cycle(client, state, settings, db_path)
 
     assert client.search_season.call_count == 2
-    # Only the successful search was logged to SQLite
+    # Both searches logged to SQLite (failed + succeeded)
     from fetcharr.db import get_recent_searches
 
     searches = await get_recent_searches(db_path)
-    assert len(searches) == 1
+    assert len(searches) == 2
+    # Newest first: Show B (searched), Show A (failed)
     assert "Show B" in searches[0]["name"]
+    assert searches[0]["outcome"] == "searched"
+    assert "Show A" in searches[1]["name"]
+    assert searches[1]["outcome"] == "failed"
 
 
 async def test_run_sonarr_cycle_cursor_advancement(tmp_path):

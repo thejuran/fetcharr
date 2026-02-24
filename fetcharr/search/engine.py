@@ -225,7 +225,10 @@ async def run_radarr_cycle(
     for movie in batch:
         try:
             await client.search_movies([movie["id"]])
-            await insert_search_entry(db_path, "Radarr", "missing", movie["title"])
+            await insert_search_entry(
+                db_path, "Radarr", "missing", movie["title"],
+                outcome="searched", detail="search triggered",
+            )
             logger.info("Radarr: Searched {title} (missing)", title=movie["title"])
             searched_count += 1
         except Exception as exc:
@@ -233,6 +236,10 @@ async def run_radarr_cycle(
                 "Radarr: Failed to search {title}: {exc}",
                 title=movie.get("title", "unknown"),
                 exc=exc,
+            )
+            await insert_search_entry(
+                db_path, "Radarr", "missing", movie.get("title", "unknown"),
+                outcome="failed", detail=str(exc)[:200],
             )
             skipped_count += 1
     state["radarr"]["missing_cursor"] = new_cursor
@@ -244,7 +251,10 @@ async def run_radarr_cycle(
     for movie in batch:
         try:
             await client.search_movies([movie["id"]])
-            await insert_search_entry(db_path, "Radarr", "cutoff", movie["title"])
+            await insert_search_entry(
+                db_path, "Radarr", "cutoff", movie["title"],
+                outcome="searched", detail="search triggered",
+            )
             logger.info("Radarr: Searched {title} (cutoff)", title=movie["title"])
             searched_count += 1
         except Exception as exc:
@@ -252,6 +262,10 @@ async def run_radarr_cycle(
                 "Radarr: Failed to search {title}: {exc}",
                 title=movie.get("title", "unknown"),
                 exc=exc,
+            )
+            await insert_search_entry(
+                db_path, "Radarr", "cutoff", movie.get("title", "unknown"),
+                outcome="failed", detail=str(exc)[:200],
             )
             skipped_count += 1
     state["radarr"]["cutoff_cursor"] = new_cursor
@@ -344,7 +358,10 @@ async def run_sonarr_cycle(
     for season in batch:
         try:
             await client.search_season(season["seriesId"], season["seasonNumber"])
-            await insert_search_entry(db_path, "Sonarr", "missing", season["display_name"])
+            await insert_search_entry(
+                db_path, "Sonarr", "missing", season["display_name"],
+                outcome="searched", detail="search triggered",
+            )
             logger.info("Sonarr: Searched {name} (missing)", name=season["display_name"])
             searched_count += 1
         except Exception as exc:
@@ -352,6 +369,10 @@ async def run_sonarr_cycle(
                 "Sonarr: Failed to search {name}: {exc}",
                 name=season.get("display_name", "unknown"),
                 exc=exc,
+            )
+            await insert_search_entry(
+                db_path, "Sonarr", "missing", season.get("display_name", "unknown"),
+                outcome="failed", detail=str(exc)[:200],
             )
             skipped_count += 1
     state["sonarr"]["missing_cursor"] = new_cursor
@@ -364,7 +385,10 @@ async def run_sonarr_cycle(
     for season in batch:
         try:
             await client.search_season(season["seriesId"], season["seasonNumber"])
-            await insert_search_entry(db_path, "Sonarr", "cutoff", season["display_name"])
+            await insert_search_entry(
+                db_path, "Sonarr", "cutoff", season["display_name"],
+                outcome="searched", detail="search triggered",
+            )
             logger.info("Sonarr: Searched {name} (cutoff)", name=season["display_name"])
             searched_count += 1
         except Exception as exc:
@@ -372,6 +396,10 @@ async def run_sonarr_cycle(
                 "Sonarr: Failed to search {name}: {exc}",
                 name=season.get("display_name", "unknown"),
                 exc=exc,
+            )
+            await insert_search_entry(
+                db_path, "Sonarr", "cutoff", season.get("display_name", "unknown"),
+                outcome="failed", detail=str(exc)[:200],
             )
             skipped_count += 1
     state["sonarr"]["cutoff_cursor"] = new_cursor

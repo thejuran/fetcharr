@@ -32,12 +32,12 @@
     <div>
       <span class="text-xs uppercase tracking-wide text-fetcharr-muted">Missing</span>
       <p class="text-sm font-medium">{{ app.missing_count if app.missing_count is not none else '&mdash;' }} items</p>
-      <p class="text-xs text-fetcharr-muted">Position {{ app.missing_cursor }}</p>
+      <p class="text-xs text-fetcharr-muted">{{ app.missing_cursor }} of {{ app.missing_count if app.missing_count is not none else '?' }}</p>
     </div>
     <div>
       <span class="text-xs uppercase tracking-wide text-fetcharr-muted">Cutoff</span>
       <p class="text-sm font-medium">{{ app.cutoff_count if app.cutoff_count is not none else '&mdash;' }} items</p>
-      <p class="text-xs text-fetcharr-muted">Position {{ app.cutoff_cursor }}</p>
+      <p class="text-xs text-fetcharr-muted">{{ app.cutoff_cursor }} of {{ app.cutoff_count if app.cutoff_count is not none else '?' }}</p>
     </div>
   </div>
 

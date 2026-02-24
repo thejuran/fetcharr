@@ -67,7 +67,10 @@ Plans:
   2. The hard max is visible and editable in the web UI config editor with validation
   3. Search history is stored in SQLite and survives container restarts (not lost on reboot)
   4. Existing in-memory search log is replaced by or backed by SQLite storage
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 11-01-PLAN.md — Hard max items per cycle (config + engine + UI + tests)
+- [ ] 11-02-PLAN.md — SQLite persistent search history (db module + migration + wiring + tests)
 
 ### Phase 12: Documentation
 **Goal**: A new user can install and configure Fetcharr from the README alone
@@ -94,5 +97,5 @@ Plans:
 | 8. Tech Debt Cleanup | v1.0 | 1/1 | Complete | 2026-02-24 |
 | 9. CI/CD Pipeline | v1.1 | Complete    | 2026-02-24 | - |
 | 10. Release Pipeline | 1/1 | Complete    | 2026-02-24 | - |
-| 11. Search Enhancements | v1.1 | 0/? | Not started | - |
+| 11. Search Enhancements | v1.1 | 0/2 | Planned | - |
 | 12. Documentation | v1.1 | 0/? | Not started | - |

@@ -46,10 +46,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **SECR-01**: API keys are stored server-side only and never returned by any HTTP endpoint
 - [x] **SECR-02**: State-changing POST endpoints reject cross-origin requests via Origin/Referer validation
-- [ ] **SECR-03**: ArrConfig URL validates scheme (http/https) and blocks cloud metadata endpoints
-- [ ] **SECR-04**: All form integer fields are bounds-checked and never crash on invalid input
+- [x] **SECR-03**: ArrConfig URL validates scheme (http/https) and blocks cloud metadata endpoints
+- [x] **SECR-04**: All form integer fields are bounds-checked and never crash on invalid input
 - [x] **SECR-05**: Docker container drops all capabilities, binds to localhost, and sets no-new-privileges
-- [ ] **SECR-06**: Config file written with restrictive permissions (0o600)
+- [x] **SECR-06**: Config file written with restrictive permissions (0o600)
 - [x] **SECR-07**: htmx bundled locally — no external CDN dependency
 
 ### Quality & Resilience

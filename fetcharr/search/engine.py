@@ -8,6 +8,7 @@ persisted to SQLite via the ``fetcharr.db`` module.
 
 from __future__ import annotations
 
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -178,6 +179,8 @@ async def run_radarr_cycle(
     Returns:
         Updated state with new cursor positions and last_run timestamp.
     """
+    cycle_start = time.monotonic()
+
     try:
         missing = await client.get_wanted_missing()
         cutoff = await client.get_wanted_cutoff()
@@ -212,6 +215,9 @@ async def run_radarr_cycle(
             c=cutoff_limit,
         )
 
+    searched_count = 0
+    skipped_count = 0
+
     # --- Missing queue ---
     missing = filter_monitored(missing)
     cursor = state["radarr"]["missing_cursor"]
@@ -221,12 +227,14 @@ async def run_radarr_cycle(
             await client.search_movies([movie["id"]])
             await insert_search_entry(db_path, "Radarr", "missing", movie["title"])
             logger.info("Radarr: Searched {title} (missing)", title=movie["title"])
+            searched_count += 1
         except Exception as exc:
             logger.warning(
                 "Radarr: Failed to search {title}: {exc}",
                 title=movie.get("title", "unknown"),
                 exc=exc,
             )
+            skipped_count += 1
     state["radarr"]["missing_cursor"] = new_cursor
 
     # --- Cutoff queue ---
@@ -238,13 +246,25 @@ async def run_radarr_cycle(
             await client.search_movies([movie["id"]])
             await insert_search_entry(db_path, "Radarr", "cutoff", movie["title"])
             logger.info("Radarr: Searched {title} (cutoff)", title=movie["title"])
+            searched_count += 1
         except Exception as exc:
             logger.warning(
                 "Radarr: Failed to search {title}: {exc}",
                 title=movie.get("title", "unknown"),
                 exc=exc,
             )
+            skipped_count += 1
     state["radarr"]["cutoff_cursor"] = new_cursor
+
+    # --- Diagnostic summary ---
+    elapsed = time.monotonic() - cycle_start
+    logger.info(
+        "Radarr: Cycle completed in {elapsed:.1f}s -- {fetched} fetched, {searched} searched, {skipped} skipped",
+        elapsed=elapsed,
+        fetched=state["radarr"]["missing_count"] + state["radarr"]["cutoff_count"],
+        searched=searched_count,
+        skipped=skipped_count,
+    )
 
     # --- Update last_run ---
     state["radarr"]["last_run"] = datetime.now(UTC).isoformat().replace("+00:00", "Z")
@@ -277,6 +297,8 @@ async def run_sonarr_cycle(
     Returns:
         Updated state with new cursor positions and last_run timestamp.
     """
+    cycle_start = time.monotonic()
+
     try:
         missing_episodes = await client.get_wanted_missing()
         cutoff_episodes = await client.get_wanted_cutoff()
@@ -311,6 +333,9 @@ async def run_sonarr_cycle(
             c=cutoff_limit,
         )
 
+    searched_count = 0
+    skipped_count = 0
+
     # --- Missing queue ---
     missing_episodes = filter_sonarr_episodes(missing_episodes)
     missing_seasons = deduplicate_to_seasons(missing_episodes)
@@ -321,12 +346,14 @@ async def run_sonarr_cycle(
             await client.search_season(season["seriesId"], season["seasonNumber"])
             await insert_search_entry(db_path, "Sonarr", "missing", season["display_name"])
             logger.info("Sonarr: Searched {name} (missing)", name=season["display_name"])
+            searched_count += 1
         except Exception as exc:
             logger.warning(
                 "Sonarr: Failed to search {name}: {exc}",
                 name=season.get("display_name", "unknown"),
                 exc=exc,
             )
+            skipped_count += 1
     state["sonarr"]["missing_cursor"] = new_cursor
 
     # --- Cutoff queue ---
@@ -339,13 +366,25 @@ async def run_sonarr_cycle(
             await client.search_season(season["seriesId"], season["seasonNumber"])
             await insert_search_entry(db_path, "Sonarr", "cutoff", season["display_name"])
             logger.info("Sonarr: Searched {name} (cutoff)", name=season["display_name"])
+            searched_count += 1
         except Exception as exc:
             logger.warning(
                 "Sonarr: Failed to search {name}: {exc}",
                 name=season.get("display_name", "unknown"),
                 exc=exc,
             )
+            skipped_count += 1
     state["sonarr"]["cutoff_cursor"] = new_cursor
+
+    # --- Diagnostic summary ---
+    elapsed = time.monotonic() - cycle_start
+    logger.info(
+        "Sonarr: Cycle completed in {elapsed:.1f}s -- {fetched} fetched, {searched} searched, {skipped} skipped",
+        elapsed=elapsed,
+        fetched=state["sonarr"]["missing_count"] + state["sonarr"]["cutoff_count"],
+        searched=searched_count,
+        skipped=skipped_count,
+    )
 
     # --- Update last_run ---
     state["sonarr"]["last_run"] = datetime.now(UTC).isoformat().replace("+00:00", "Z")

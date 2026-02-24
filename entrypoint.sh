@@ -33,4 +33,11 @@ chown -R "$PUID:$PGID" /config
 # Drop privileges and exec into Fetcharr.
 # exec replaces this shell so python becomes PID 1 and receives SIGTERM
 # from `docker stop` directly.
-exec setpriv --reuid="$PUID" --regid="$PGID" --init-groups --no-new-privileges python -m fetcharr
+# Detect --no-new-privileges support (Synology DSM ships a stripped setpriv)
+if setpriv --no-new-privileges true 2>/dev/null; then
+    NO_NEW_PRIVS="--no-new-privileges"
+else
+    echo "WARNING: setpriv --no-new-privileges not supported, skipping"
+    NO_NEW_PRIVS=""
+fi
+exec setpriv --reuid="$PUID" --regid="$PGID" --init-groups $NO_NEW_PRIVS python -m fetcharr

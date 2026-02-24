@@ -132,6 +132,10 @@ Anyone with network access to port 8080 can view the dashboard and edit configur
 
 Bind to localhost (`127.0.0.1:8080:8080` as shown in the docker-compose example) and access via Tailscale or a reverse proxy with authentication.
 
+### Synology NAS
+
+Synology DSM ships a stripped-down `setpriv` that doesn't support `--no-new-privileges`. Fetcharr detects this automatically and skips the flag — no configuration changes needed. The `security_opt: no-new-privileges:true` in your `docker-compose.yml` still applies at the Docker level regardless.
+
 ## Development
 
 ```bash

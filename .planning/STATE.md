@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 6 of 7 (Bug Fixes & Resilience)
-Plan: 2 of 3 in current phase
-Status: In Progress
-Last activity: 2026-02-24 — Completed 06-02 (Exception hierarchy and API resilience)
+Plan: 3 of 3 in current phase (COMPLETE)
+Status: Phase Complete
+Last activity: 2026-02-24 — Completed 06-03 (Concurrency lock, settings validation, traceback redaction)
 
-Progress: [█████████████████████░░░░░░░░░] 71% (5/7 phases)
+Progress: [█████████████████████████░░░░░] 86% (6/7 phases)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
+- Total plans completed: 15
 - Average duration: 2min
-- Total execution time: 32min
+- Total execution time: 34min
 
 **By Phase:**
 
@@ -32,10 +32,10 @@ Progress: [█████████████████████░░
 | 3. Web UI | 3/3 | 8min | 3min |
 | 4. Docker | 1/1 | 2min | 2min |
 | 5. Security Hardening | 2/2 | 4min | 2min |
-| 6. Bug Fixes & Resilience | 2/3 | 4min | 2min |
+| 6. Bug Fixes & Resilience | 3/3 | 6min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (2min), 05-01 (2min), 05-02 (2min), 06-01 (2min), 06-02 (2min)
+- Last 5 plans: 05-01 (2min), 05-02 (2min), 06-01 (2min), 06-02 (2min), 06-03 (2min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -91,6 +91,11 @@ Recent decisions affecting current work:
 - [06-02]: TransportError replaces ConnectError+TimeoutException in retry catch (covers RemoteProtocolError, ReadError)
 - [06-02]: httpx.HTTPError replaces redundant subcatches in cycle abort handlers
 - [06-02]: ValidationError added to cycle abort catches for get_paginated model_validate failures
+- [06-03]: Custom loguru sink replaces filter for traceback redaction (filter only sees message, sink sees full output)
+- [06-03]: colorize=False on custom sink -- loguru cannot auto-detect terminal on function sinks
+- [06-03]: asyncio.Lock on app.state.search_lock serializes scheduler and manual search-now cycles
+- [06-03]: Settings validated via SettingsModel(**new_config) before disk write -- invalid config never persisted
+- [06-03]: Log redaction refreshed after settings save to pick up changed API keys
 
 ### Roadmap Evolution
 
@@ -110,5 +115,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 06-02-PLAN.md
+Stopped at: Completed 06-03-PLAN.md
 Resume file: None

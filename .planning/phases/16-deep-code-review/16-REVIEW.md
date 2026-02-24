@@ -8,6 +8,14 @@
 |-------|-----------------|----------------|
 | 32    | 18              | 14             |
 
+## Resolution Summary
+
+| Level | Total | Fixed | Won't Fix | Deferred |
+|-------|-------|-------|-----------|----------|
+| Warning (80-94) | 8 | 7 | 1 | 0 |
+| Medium (70-79) | 8 | 0 | 0 | 8 |
+| Filtered (<70) | 14 | 0 | 0 | 14 |
+
 ---
 
 ## Warning (80-94)
@@ -16,6 +24,7 @@
 
 **File:** `fetcharr/templates/partials/history_results.html:89`
 **Confidence:** 88 | CWE-79
+**Resolution:** Fixed -- hx-vals switched to double-quoted tojson filter pattern
 
 Jinja2 autoescaping does not escape single quotes. The `hx-vals` attribute uses single-quote delimiters, so a crafted `?search=foo' onmouseover='alert(1)` breaks out of the attribute context.
 
@@ -28,6 +37,7 @@ Jinja2 autoescaping does not escape single quotes. The `hx-vals` attribute uses 
 
 **File:** `fetcharr/web/routes.py:235`
 **Confidence:** 90 | CLAUDE.md violation
+**Resolution:** Fixed -- atomic write-then-rename via tempfile + fsync + os.replace
 
 `save_settings` uses `config_path.write_text()` -- a crash mid-write corrupts the config. CLAUDE.md requires atomic write-then-rename (the pattern used in `state.py`).
 
@@ -46,6 +56,7 @@ Jinja2 autoescaping does not escape single quotes. The `hx-vals` attribute uses 
 
 **File:** `fetcharr/web/routes.py:162`
 **Confidence:** 85
+**Resolution:** Fixed -- bare int() replaced with safe_int()
 
 Bare `int()` on the query param raises `ValueError` on non-numeric input. The existing `safe_int` helper was built for exactly this.
 
@@ -58,6 +69,7 @@ Bare `int()` on the query param raises `ValueError` on non-numeric input. The ex
 
 **File:** `fetcharr/db.py:118, 189, 198`
 **Confidence:** 88
+**Resolution:** Fixed -- all cursors wrapped in async with for deterministic cleanup
 
 Cursors from `db.execute()` are never explicitly closed. Use `async with` to ensure deterministic cleanup.
 
@@ -72,6 +84,7 @@ Cursors from `db.execute()` are never explicitly closed. Use `async with` to ens
 
 **File:** `fetcharr/db.py:223`
 **Confidence:** 82
+**Resolution:** Fixed -- per_page/page guards added at function top
 
 Not currently exploitable from the web layer (default=50), but the function's public API accepts any int.
 
@@ -87,6 +100,7 @@ Not currently exploitable from the web layer (default=50), but the function's pu
 
 **File:** `fetcharr/clients/sonarr.py:45`
 **Confidence:** 85
+**Resolution:** Won't Fix -- broad except Exception is intentional safety net in Sonarr client (per user decision)
 
 `except (httpx.HTTPError, pydantic.ValidationError, KeyError, Exception)` -- the specific types are dead code since `Exception` catches everything. Violates CLAUDE.md's established error-handling pattern.
 
@@ -99,6 +113,7 @@ Not currently exploitable from the web layer (default=50), but the function's pu
 
 **File:** `fetcharr/web/validation.py:13`
 **Confidence:** 80 | CWE-918
+**Resolution:** Fixed -- added Azure/Alibaba metadata hosts, is_loopback check for IPv6/IPv4 loopback and 0.0.0.0
 
 Only blocks `169.254.169.254` and `metadata.google.internal`. Missing `::1`, `0.0.0.0`, `100.100.100.200`, `metadata.azure.com`.
 
@@ -117,6 +132,7 @@ Only blocks `169.254.169.254` and `metadata.google.internal`. Missing `::1`, `0.
 
 **File:** `fetcharr/web/routes.py:228-232`
 **Confidence:** 80
+**Resolution:** Fixed -- narrowed to pydantic.ValidationError with error detail logging
 
 Only `pydantic.ValidationError` is expected here. The broad catch hides other bugs.
 
@@ -135,6 +151,7 @@ Only `pydantic.ValidationError` is expected here. The broad catch hides other bu
 
 **File:** `fetcharr/templates/partials/search_log.html:19`, `fetcharr/templates/partials/history_results.html:110`
 **Confidence:** 72 | CWE-79
+**Resolution:** Deferred -- backlog for next milestone
 
 Relies on Jinja2 autoescaping being enabled. Explicit `| e` filter makes the protection visible.
 
@@ -147,6 +164,7 @@ Relies on Jinja2 autoescaping being enabled. Explicit `| e` filter makes the pro
 
 **File:** `fetcharr/db.py:62-64`
 **Confidence:** 75 | CWE-89
+**Resolution:** Deferred -- backlog for next milestone
 
 Column names interpolated via f-string. Values are hardcoded so no active risk, but the pattern is visually indistinguishable from unsafe SQL.
 
@@ -154,6 +172,7 @@ Column names interpolated via f-string. Values are hardcoded so no active risk, 
 
 **File:** `fetcharr/db.py:61-64`
 **Confidence:** 78
+**Resolution:** Deferred -- backlog for next milestone
 
 Only `OperationalError` (duplicate column) should be suppressed.
 
@@ -166,6 +185,7 @@ Only `OperationalError` (duplicate column) should be suppressed.
 
 **File:** `fetcharr/db.py:189-202`
 **Confidence:** 75
+**Resolution:** Deferred -- backlog for next milestone
 
 Not a bug today, but a latent mutation hazard if the function is extended.
 
@@ -178,6 +198,7 @@ Not a bug today, but a latent mutation hazard if the function is extended.
 
 **File:** `fetcharr/config.py:84-88`
 **Confidence:** 78
+**Resolution:** Deferred -- backlog for next milestone
 
 Pre-bootstrap message uses `print(file=sys.stderr)`. CLAUDE.md says "never print."
 
@@ -191,6 +212,7 @@ Pre-bootstrap message uses `print(file=sys.stderr)`. CLAUDE.md says "never print
 
 **File:** `fetcharr/search/scheduler.py:75`
 **Confidence:** 78
+**Resolution:** Deferred -- backlog for next milestone
 
 Triggers ruff UP006. The `# type: ignore` comment acknowledges but doesn't fix.
 
@@ -203,6 +225,7 @@ Triggers ruff UP006. The `# type: ignore` comment acknowledges but doesn't fix.
 
 **File:** `fetcharr/clients/base.py:145`, `fetcharr/clients/sonarr.py:38`
 **Confidence:** 75
+**Resolution:** Deferred -- backlog for next milestone
 
 Every other method goes through the retry wrapper. These two call `self._client.get` directly -- inconsistent and specifically lacking retry during startup.
 
@@ -210,6 +233,7 @@ Every other method goes through the retry wrapper. These two call `self._client.
 
 **File:** `fetcharr/models/config.py` + `fetcharr/config.py`
 **Confidence:** 72
+**Resolution:** Deferred -- backlog for next milestone
 
 `load_settings` manually reads TOML and passes it to `Settings(**data)`, bypassing pydantic-settings source loading entirely.
 

@@ -222,8 +222,9 @@ async def run_radarr_cycle(
     missing_limit = settings.radarr.search_missing_count
     cutoff_limit = settings.radarr.search_cutoff_count
     hard_max = settings.general.hard_max_per_cycle
+    orig_missing, orig_cutoff = missing_limit, cutoff_limit
     missing_limit, cutoff_limit = cap_batch_sizes(missing_limit, cutoff_limit, hard_max)
-    if hard_max > 0 and (missing_limit != settings.radarr.search_missing_count or cutoff_limit != settings.radarr.search_cutoff_count):
+    if hard_max > 0 and (missing_limit != orig_missing or cutoff_limit != orig_cutoff):
         logger.debug(
             "Radarr: Hard max {max} applied -- missing={m}, cutoff={c}",
             max=hard_max,
@@ -318,8 +319,9 @@ async def run_sonarr_cycle(
     missing_limit = settings.sonarr.search_missing_count
     cutoff_limit = settings.sonarr.search_cutoff_count
     hard_max = settings.general.hard_max_per_cycle
+    orig_missing, orig_cutoff = missing_limit, cutoff_limit
     missing_limit, cutoff_limit = cap_batch_sizes(missing_limit, cutoff_limit, hard_max)
-    if hard_max > 0 and (missing_limit != settings.sonarr.search_missing_count or cutoff_limit != settings.sonarr.search_cutoff_count):
+    if hard_max > 0 and (missing_limit != orig_missing or cutoff_limit != orig_cutoff):
         logger.debug(
             "Sonarr: Hard max {max} applied -- missing={m}, cutoff={c}",
             max=hard_max,

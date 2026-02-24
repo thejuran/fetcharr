@@ -116,6 +116,7 @@ async def settings_page(request: Request) -> HTMLResponse:
         context={
             "apps": apps,
             "log_level": settings.general.log_level,
+            "hard_max_per_cycle": settings.general.hard_max_per_cycle,
         },
     )
 
@@ -133,6 +134,7 @@ async def save_settings(request: Request) -> RedirectResponse:
     new_config: dict = {
         "general": {
             "log_level": safe_log_level(form.get("log_level")),
+            "hard_max_per_cycle": safe_int(form.get("hard_max_per_cycle"), 0, 0, 1000),
         },
     }
 

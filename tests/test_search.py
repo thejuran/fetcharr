@@ -18,6 +18,7 @@ import httpx
 from fetcharr.search.engine import (
     SEARCH_LOG_MAX,
     append_search_log,
+    cap_batch_sizes,
     deduplicate_to_seasons,
     filter_monitored,
     filter_sonarr_episodes,
@@ -455,3 +456,48 @@ async def test_run_sonarr_cycle_cursor_advancement():
 
     result = await run_sonarr_cycle(client, result, settings)
     assert result["sonarr"]["missing_cursor"] == 0
+
+
+# ---------------------------------------------------------------------------
+# cap_batch_sizes
+# ---------------------------------------------------------------------------
+
+
+def test_cap_batch_sizes_unlimited():
+    """hard_max=0 returns inputs unchanged (unlimited mode)."""
+    assert cap_batch_sizes(5, 5, 0) == (5, 5)
+    assert cap_batch_sizes(100, 50, 0) == (100, 50)
+    assert cap_batch_sizes(0, 0, 0) == (0, 0)
+
+
+def test_cap_batch_sizes_no_cap_needed():
+    """Total within limit returns inputs unchanged."""
+    assert cap_batch_sizes(3, 3, 10) == (3, 3)
+    assert cap_batch_sizes(5, 5, 10) == (5, 5)
+    assert cap_batch_sizes(1, 1, 100) == (1, 1)
+
+
+def test_cap_batch_sizes_proportional_split():
+    """Total exceeds limit, verify proportional reduction."""
+    # 5+5=10 > 6 -> missing gets floor(5*6/10)=3, cutoff gets 6-3=3
+    assert cap_batch_sizes(5, 5, 6) == (3, 3)
+    # 8+2=10 > 5 -> missing gets floor(8*5/10)=4, cutoff gets 5-4=1
+    assert cap_batch_sizes(8, 2, 5) == (4, 1)
+    # 2+8=10 > 5 -> missing gets floor(2*5/10)=1, cutoff gets 5-1=4
+    assert cap_batch_sizes(2, 8, 5) == (1, 4)
+
+
+def test_cap_batch_sizes_one_zero():
+    """One queue is 0, other gets full cap."""
+    # missing=0, cutoff=10 > hard_max=5 -> missing floor(0*5/10)=0, cutoff=5
+    assert cap_batch_sizes(0, 10, 5) == (0, 5)
+    # missing=10, cutoff=0 > hard_max=5 -> missing floor(10*5/10)=5, cutoff=0
+    assert cap_batch_sizes(10, 0, 5) == (5, 0)
+
+
+def test_cap_batch_sizes_very_small_max():
+    """hard_max=1 with both queues requesting items."""
+    # 5+5=10 > 1 -> missing gets floor(5*1/10)=0, cutoff gets 1-0=1
+    assert cap_batch_sizes(5, 5, 1) == (0, 1)
+    # 1+1=2 > 1 -> missing gets floor(1*1/2)=0, cutoff gets 1-0=1
+    assert cap_batch_sizes(1, 1, 1) == (0, 1)

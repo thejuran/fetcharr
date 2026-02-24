@@ -24,6 +24,13 @@
                     {% endfor %}
                 </select>
             </div>
+            <div>
+                <label class="block text-sm text-fetcharr-muted mb-1">Hard Max Items Per Cycle</label>
+                <input type="number" name="hard_max_per_cycle" value="{{ hard_max_per_cycle }}"
+                       min="0" max="1000"
+                       class="w-full bg-fetcharr-bg border border-fetcharr-border rounded px-3 py-2 text-sm">
+                <p class="text-xs text-fetcharr-muted mt-1">0 = unlimited. Caps total items per app per cycle.</p>
+            </div>
         </div>
     </section>
 

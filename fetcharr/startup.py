@@ -60,9 +60,9 @@ async def validate_connections(settings: Settings) -> dict[str, bool]:
     """Validate connections to all enabled *arr applications.
 
     For each enabled app, creates a temporary client, calls
-    ``validate_connection()``, and closes the client.  Clients are
-    not kept open -- the search engine will create its own clients
-    in Phase 2.
+    ``validate_connection()``, and closes the client.  These clients
+    are temporary -- the scheduler creates its own long-lived clients
+    that persist for the lifetime of the application.
 
     Per locked decision: unreachable apps log a warning but do NOT
     cause the process to exit.

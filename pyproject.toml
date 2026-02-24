@@ -14,6 +14,7 @@ dependencies = [
     "tomli-w",
     "fastapi",
     "uvicorn[standard]",
+    "apscheduler>=3.11,<4",
 ]
 
 [project.optional-dependencies]

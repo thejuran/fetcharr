@@ -22,6 +22,10 @@ class AppState(TypedDict, total=False):
     missing_cursor: int
     cutoff_cursor: int
     last_run: str | None  # ISO timestamp
+    connected: bool | None  # True after successful fetch, False after failure
+    unreachable_since: str | None  # ISO timestamp of first failure, None when healthy
+    missing_count: int | None  # Total wanted-missing items (before filtering)
+    cutoff_count: int | None  # Total cutoff-unmet items (before filtering)
 
 
 class FetcharrState(TypedDict, total=False):

@@ -171,7 +171,20 @@ async def run_radarr_cycle(
         cutoff = await client.get_wanted_cutoff()
     except (httpx.HTTPStatusError, httpx.ConnectError, httpx.TimeoutException, httpx.HTTPError) as exc:
         logger.warning("Radarr: Cycle aborted -- {exc}", exc=exc)
+        state["radarr"]["connected"] = False
+        if not state["radarr"].get("unreachable_since"):
+            state["radarr"]["unreachable_since"] = (
+                datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+            )
         return state
+
+    # Track connection health (WEBU-06)
+    state["radarr"]["connected"] = True
+    state["radarr"]["unreachable_since"] = None
+
+    # Cache raw item counts before filtering (WEBU-04)
+    state["radarr"]["missing_count"] = len(missing)
+    state["radarr"]["cutoff_count"] = len(cutoff)
 
     # --- Missing queue ---
     missing = filter_monitored(missing)
@@ -241,7 +254,20 @@ async def run_sonarr_cycle(
         cutoff_episodes = await client.get_wanted_cutoff()
     except (httpx.HTTPStatusError, httpx.ConnectError, httpx.TimeoutException, httpx.HTTPError) as exc:
         logger.warning("Sonarr: Cycle aborted -- {exc}", exc=exc)
+        state["sonarr"]["connected"] = False
+        if not state["sonarr"].get("unreachable_since"):
+            state["sonarr"]["unreachable_since"] = (
+                datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+            )
         return state
+
+    # Track connection health (WEBU-06)
+    state["sonarr"]["connected"] = True
+    state["sonarr"]["unreachable_since"] = None
+
+    # Cache raw item counts before filtering (WEBU-04)
+    state["sonarr"]["missing_count"] = len(missing_episodes)
+    state["sonarr"]["cutoff_count"] = len(cutoff_episodes)
 
     # --- Missing queue ---
     missing_episodes = filter_sonarr_episodes(missing_episodes)

@@ -1,4 +1,10 @@
-"""Loguru logging setup with API key redaction filter."""
+"""Loguru logging setup with API key redaction via custom sink.
+
+Uses a custom sink function (not a filter) so that the COMPLETE formatted
+output -- including exception tracebacks -- is redacted.  A filter only
+sees ``record["message"]`` and cannot redact secrets that appear in
+stack traces (e.g. httpx exception messages containing API keys).
+"""
 
 from __future__ import annotations
 
@@ -8,38 +14,43 @@ from collections.abc import Callable
 from loguru import logger
 
 
-def create_redaction_filter(secrets: list[str]) -> Callable:
-    """Create a loguru filter that redacts secret values from log messages.
+def create_redacting_sink(secrets: list[str], stream=sys.stderr) -> Callable:
+    """Create a loguru sink that redacts secrets from the full formatted output.
 
-    Returns a filter function that replaces any occurrence of a secret
-    string in ``record["message"]`` with ``[REDACTED]``. Empty strings
-    in the secrets list are skipped.
+    Unlike a filter (which only sees record["message"]), a custom sink
+    receives the COMPLETE formatted string including exception tracebacks.
+    This ensures API keys that appear in httpx exception messages or
+    stack traces are also redacted.
 
     Args:
-        secrets: List of secret values to redact from log output.
+        secrets: List of secret values to redact.
+        stream: Output stream (defaults to stderr).
 
     Returns:
-        A loguru-compatible filter function.
+        A loguru-compatible sink function.
     """
 
-    def redact(record: dict) -> bool:
+    def sink(message):
+        text = str(message)
         for secret in secrets:
-            if secret and secret in record["message"]:
-                record["message"] = record["message"].replace(
-                    secret, "[REDACTED]"
-                )
-        return True
+            if secret:
+                text = text.replace(secret, "[REDACTED]")
+        stream.write(text)
+        stream.flush()
 
-    return redact
+    return sink
 
 
 def setup_logging(level: str, secrets: list[str]) -> None:
     """Configure loguru with human-readable format and secret redaction.
 
-    Removes the default handler and adds a new stderr handler with:
+    Removes the default handler and adds a new handler using a custom
+    redacting sink that processes the full formatted output including
+    exception tracebacks.
+
     - Format: ``2026-02-23 14:30:00 INFO     Connected to Radarr``
     - Configurable log level
-    - Automatic redaction of all secret values
+    - Automatic redaction of all secret values in messages AND tracebacks
 
     Args:
         level: Log level string (e.g. "info", "debug", "warning").
@@ -47,9 +58,8 @@ def setup_logging(level: str, secrets: list[str]) -> None:
     """
     logger.remove()
     logger.add(
-        sys.stderr,
+        create_redacting_sink(secrets),
         format="{time:YYYY-MM-DD HH:mm:ss} {level:<8} {message}",
         level=level.upper(),
-        filter=create_redaction_filter(secrets),
-        colorize=True,
+        colorize=False,  # Custom sink function, not a stream -- no ANSI auto-detect
     )

@@ -14,16 +14,16 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Search Engine
 
-- [ ] **SRCH-01**: Fetcharr fetches wanted (missing) items from Radarr
-- [ ] **SRCH-02**: Fetcharr fetches cutoff unmet items from Radarr
-- [ ] **SRCH-03**: Fetcharr fetches wanted (missing) items from Sonarr
-- [ ] **SRCH-04**: Fetcharr fetches cutoff unmet items from Sonarr
-- [ ] **SRCH-05**: Fetcharr cycles through items sequentially via round-robin, wrapping to start
-- [ ] **SRCH-06**: Sonarr searches trigger at season level using SeasonSearch command
-- [ ] **SRCH-07**: Missing and cutoff queues are separate per app with independent cursors
+- [x] **SRCH-01**: Fetcharr fetches wanted (missing) items from Radarr
+- [x] **SRCH-02**: Fetcharr fetches cutoff unmet items from Radarr
+- [x] **SRCH-03**: Fetcharr fetches wanted (missing) items from Sonarr
+- [x] **SRCH-04**: Fetcharr fetches cutoff unmet items from Sonarr
+- [x] **SRCH-05**: Fetcharr cycles through items sequentially via round-robin, wrapping to start
+- [x] **SRCH-06**: Sonarr searches trigger at season level using SeasonSearch command
+- [x] **SRCH-07**: Missing and cutoff queues are separate per app with independent cursors
 - [ ] **SRCH-08**: Round-robin cursor positions persist across container restarts
 - [x] **SRCH-09**: Unmonitored items are filtered out before adding to search queue
-- [ ] **SRCH-10**: Future air date items are filtered out of Sonarr queues
+- [x] **SRCH-10**: Future air date items are filtered out of Sonarr queues
 - [x] **SRCH-11**: Search log entries show human-readable item names, not just IDs
 
 ### Configuration
@@ -90,16 +90,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CONN-01 | Phase 1 | Complete |
 | CONN-02 | Phase 1 | Complete |
 | SECR-01 | Phase 1 | Complete |
-| SRCH-01 | Phase 2 | Pending |
-| SRCH-02 | Phase 2 | Pending |
-| SRCH-03 | Phase 2 | Pending |
-| SRCH-04 | Phase 2 | Pending |
-| SRCH-05 | Phase 2 | Pending |
-| SRCH-06 | Phase 2 | Pending |
-| SRCH-07 | Phase 2 | Pending |
+| SRCH-01 | Phase 2 | Complete |
+| SRCH-02 | Phase 2 | Complete |
+| SRCH-03 | Phase 2 | Complete |
+| SRCH-04 | Phase 2 | Complete |
+| SRCH-05 | Phase 2 | Complete |
+| SRCH-06 | Phase 2 | Complete |
+| SRCH-07 | Phase 2 | Complete |
 | SRCH-08 | Phase 2 | Pending |
 | SRCH-09 | Phase 2 | Complete |
-| SRCH-10 | Phase 2 | Pending |
+| SRCH-10 | Phase 2 | Complete |
 | SRCH-11 | Phase 2 | Complete |
 | CONF-01 | Phase 2 | Complete |
 | CONF-02 | Phase 2 | Complete |

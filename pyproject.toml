@@ -15,12 +15,15 @@ dependencies = [
     "fastapi",
     "uvicorn[standard]",
     "apscheduler>=3.11,<4",
+    "jinja2",
+    "aiofiles",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest",
     "pytest-asyncio",
+    "pytailwindcss",
 ]
 
 [project.scripts]

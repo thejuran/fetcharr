@@ -1,9 +1,10 @@
 """APScheduler integration with FastAPI lifespan for automated search cycles.
 
 Creates interval jobs for Radarr and Sonarr search cycles, managed through
-FastAPI's lifespan context manager.  State is shared by reference (safe
-because AsyncIOScheduler runs jobs on the same event loop) and persisted
-to disk after every cycle.
+FastAPI's lifespan context manager.  Shared state is exposed on ``app.state``
+so that web routes can read it without coupling.  The ``make_search_job``
+factory creates job closures that read from ``app.state`` rather than
+capturing variables, enabling future hot-reload of clients and settings.
 """
 
 from __future__ import annotations
@@ -11,7 +12,7 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import AsyncIterator
+from typing import AsyncIterator, Callable, Coroutine
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI
@@ -24,18 +25,61 @@ from fetcharr.search.engine import run_radarr_cycle, run_sonarr_cycle
 from fetcharr.state import FetcharrState, load_state, save_state
 
 
+def make_search_job(
+    app: FastAPI, app_name: str, state_path: Path
+) -> Callable[[], Coroutine]:
+    """Create an async job function that reads client/state/settings from app.state.
+
+    The returned closure reads all shared objects from ``app.state`` at
+    execution time rather than capturing them at creation time.  This
+    allows the config editor (Plan 03) to swap clients and settings
+    without restarting the scheduler.
+
+    Args:
+        app: The FastAPI application instance.
+        app_name: One of "radarr" or "sonarr".
+        state_path: Path to the JSON state file for persistence.
+
+    Returns:
+        An async callable suitable for ``scheduler.add_job()``.
+    """
+    cycle_fn = run_radarr_cycle if app_name == "radarr" else run_sonarr_cycle
+
+    async def job() -> None:
+        client = getattr(app.state, f"{app_name}_client", None)
+        if client is None:
+            return
+        try:
+            app.state.fetcharr_state = await cycle_fn(
+                client,
+                app.state.fetcharr_state,
+                app.state.settings,
+            )
+            save_state(app.state.fetcharr_state, state_path)
+        except Exception as exc:
+            logger.error(
+                "{app}: Unhandled error in search cycle -- {exc}",
+                app=app_name.title(),
+                exc=exc,
+            )
+
+    return job
+
+
 def create_lifespan(
-    settings: Settings, state_path: Path
+    settings: Settings, state_path: Path, config_path: Path
 ) -> callable:  # type: ignore[type-arg]
     """Build a FastAPI lifespan context manager wired to APScheduler.
 
     Creates long-lived API clients for enabled apps, schedules interval
     jobs for each, and ensures clean shutdown of both the scheduler and
-    clients on application exit.
+    clients on application exit.  All shared objects are exposed on
+    ``app.state`` for web route access.
 
     Args:
         settings: Application settings with app configs and intervals.
         state_path: Path to the JSON state file for persistence.
+        config_path: Path to the TOML configuration file.
 
     Returns:
         An async context manager suitable for ``FastAPI(lifespan=...)``.
@@ -62,49 +106,32 @@ def create_lifespan(
                 api_key=settings.sonarr.api_key.get_secret_value(),
             )
 
-        # --- Define wrapper functions that capture state by reference ---
-        async def radarr_job() -> None:
-            nonlocal state
-            try:
-                state = await run_radarr_cycle(radarr_client, state, settings)  # type: ignore[arg-type]
-                save_state(state, state_path)
-            except Exception as exc:
-                logger.error("Radarr: Unhandled error in search cycle -- {exc}", exc=exc)
+        # --- Expose all shared state on app.state ---
+        app.state.fetcharr_state = state
+        app.state.settings = settings
+        app.state.scheduler = scheduler
+        app.state.radarr_client = radarr_client
+        app.state.sonarr_client = sonarr_client
+        app.state.config_path = config_path
+        app.state.state_path = state_path
 
-        async def sonarr_job() -> None:
-            nonlocal state
-            try:
-                state = await run_sonarr_cycle(sonarr_client, state, settings)  # type: ignore[arg-type]
-                save_state(state, state_path)
-            except Exception as exc:
-                logger.error("Sonarr: Unhandled error in search cycle -- {exc}", exc=exc)
-
-        # --- Schedule jobs only for enabled apps ---
-        if settings.radarr.enabled:
-            scheduler.add_job(
-                radarr_job,
-                "interval",
-                minutes=settings.radarr.search_interval,
-                id="radarr_search",
-                next_run_time=datetime.now(timezone.utc),
-            )
-            logger.info(
-                "Scheduled Radarr search every {interval}m (first run: now)",
-                interval=settings.radarr.search_interval,
-            )
-
-        if settings.sonarr.enabled:
-            scheduler.add_job(
-                sonarr_job,
-                "interval",
-                minutes=settings.sonarr.search_interval,
-                id="sonarr_search",
-                next_run_time=datetime.now(timezone.utc),
-            )
-            logger.info(
-                "Scheduled Sonarr search every {interval}m (first run: now)",
-                interval=settings.sonarr.search_interval,
-            )
+        # --- Schedule jobs for enabled apps using make_search_job ---
+        for name in ("radarr", "sonarr"):
+            app_config = getattr(settings, name)
+            if app_config.enabled:
+                job_fn = make_search_job(app, name, state_path)
+                scheduler.add_job(
+                    job_fn,
+                    "interval",
+                    minutes=app_config.search_interval,
+                    id=f"{name}_search",
+                    next_run_time=datetime.now(timezone.utc),
+                )
+                logger.info(
+                    "Scheduled {app} search every {interval}m (first run: now)",
+                    app=name.title(),
+                    interval=app_config.search_interval,
+                )
 
         scheduler.start()
 
@@ -113,10 +140,11 @@ def create_lifespan(
         finally:
             scheduler.shutdown(wait=False)
 
-            if radarr_client is not None:
-                await radarr_client.close()
-            if sonarr_client is not None:
-                await sonarr_client.close()
+            # Close clients from app.state (may have been replaced by config editor)
+            for name in ("radarr", "sonarr"):
+                client = getattr(app.state, f"{name}_client", None)
+                if client:
+                    await client.close()
 
             logger.info("Search engine stopped")
 

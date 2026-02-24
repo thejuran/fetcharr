@@ -6,10 +6,13 @@ import asyncio
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from loguru import logger
 
+from fetcharr.models.config import CONFIG_PATH
 from fetcharr.search.scheduler import create_lifespan
 from fetcharr.state import STATE_PATH
+from fetcharr.web.routes import STATIC_DIR, router
 
 
 def main() -> None:
@@ -31,7 +34,9 @@ async def _run() -> None:
 
     settings = await startup()
 
-    app = FastAPI(lifespan=create_lifespan(settings, STATE_PATH))
+    app = FastAPI(lifespan=create_lifespan(settings, STATE_PATH, CONFIG_PATH))
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+    app.include_router(router)
 
     config = uvicorn.Config(
         app,

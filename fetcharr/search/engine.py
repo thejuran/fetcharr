@@ -10,6 +10,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 import httpx
+import pydantic
 from loguru import logger
 
 from fetcharr.clients.radarr import RadarrClient
@@ -98,15 +99,19 @@ def deduplicate_to_seasons(episodes: list[dict]) -> list[dict]:
     seen: set[tuple[int, int]] = set()
     seasons: list[dict] = []
     for ep in episodes:
-        key = (ep["seriesId"], ep["seasonNumber"])
+        series_id = ep.get("seriesId")
+        season_number = ep.get("seasonNumber")
+        if series_id is None or season_number is None:
+            continue
+        key = (series_id, season_number)
         if key not in seen:
             seen.add(key)
-            title = ep.get("series", {}).get("title", f"Series {ep['seriesId']}")
+            title = ep.get("series", {}).get("title", f"Series {series_id}")
             seasons.append(
                 {
-                    "seriesId": ep["seriesId"],
-                    "seasonNumber": ep["seasonNumber"],
-                    "display_name": f"{title} - Season {ep['seasonNumber']}",
+                    "seriesId": series_id,
+                    "seasonNumber": season_number,
+                    "display_name": f"{title} - Season {season_number}",
                 }
             )
     return seasons
@@ -169,7 +174,7 @@ async def run_radarr_cycle(
     try:
         missing = await client.get_wanted_missing()
         cutoff = await client.get_wanted_cutoff()
-    except (httpx.HTTPStatusError, httpx.ConnectError, httpx.TimeoutException, httpx.HTTPError) as exc:
+    except (httpx.HTTPError, pydantic.ValidationError) as exc:
         logger.warning("Radarr: Cycle aborted -- {exc}", exc=exc)
         state["radarr"]["connected"] = False
         if not state["radarr"].get("unreachable_since"):
@@ -252,7 +257,7 @@ async def run_sonarr_cycle(
     try:
         missing_episodes = await client.get_wanted_missing()
         cutoff_episodes = await client.get_wanted_cutoff()
-    except (httpx.HTTPStatusError, httpx.ConnectError, httpx.TimeoutException, httpx.HTTPError) as exc:
+    except (httpx.HTTPError, pydantic.ValidationError) as exc:
         logger.warning("Sonarr: Cycle aborted -- {exc}", exc=exc)
         state["sonarr"]["connected"] = False
         if not state["sonarr"].get("unreachable_since"):

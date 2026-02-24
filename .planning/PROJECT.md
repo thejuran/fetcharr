@@ -31,9 +31,24 @@ Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible 
 
 ### Active
 
+- [ ] README with install guide, config reference, and security model
+- [ ] GitHub Actions CI (pytest, lint, Docker build validation)
+- [ ] Docker release pipeline — dev tag on push, latest + version on release (ghcr.io)
+- [ ] Local deep code review convention (Claude offers /deep-review before push)
 - [ ] Configurable hard limit / safety ceiling on max items per cycle
 - [ ] Persistent search history beyond in-memory log (SQLite storage)
-- [ ] README documenting explicit security model
+
+## Current Milestone: v1.1 Ship & Document
+
+**Goal:** Make Fetcharr installable by others — README, CI/CD, automated Docker releases, plus small feature additions.
+
+**Target features:**
+- README and documentation for GitHub
+- GitHub Actions CI pipeline (tests, lint, Docker build)
+- Docker image release strategy (dev/latest/versioned on ghcr.io)
+- Deep code review convention before pushing
+- Hard limit on items per cycle
+- Persistent search history (SQLite)
 
 ### Out of Scope
 
@@ -83,4 +98,4 @@ Known concerns for next milestone:
 | Custom loguru sink for redaction | Filter only sees message, sink sees full output including tracebacks | ✓ Good |
 
 ---
-*Last updated: 2026-02-24 after v1.0 milestone*
+*Last updated: 2026-02-24 after v1.1 milestone start*

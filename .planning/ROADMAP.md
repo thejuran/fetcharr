@@ -54,7 +54,9 @@ Plans:
   1. Pushing to main builds and pushes ghcr.io/thejuran/fetcharr:dev automatically
   2. Pushing a version tag (e.g., v1.1.0) builds and pushes both :latest and the version-tagged image to ghcr.io
   3. CLAUDE.md contains the deep code review convention so Claude offers /deep-review before push
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 10-01-PLAN.md — GHCR release workflow + CLAUDE.md deep review convention
 
 ### Phase 11: Search Enhancements
 **Goal**: Users have a safety ceiling on search volume and persistent search history that survives restarts
@@ -91,6 +93,6 @@ Plans:
 | 7. Test Coverage | v1.0 | 2/2 | Complete | 2026-02-24 |
 | 8. Tech Debt Cleanup | v1.0 | 1/1 | Complete | 2026-02-24 |
 | 9. CI/CD Pipeline | v1.1 | Complete    | 2026-02-24 | - |
-| 10. Release Pipeline | v1.1 | 0/? | Not started | - |
+| 10. Release Pipeline | v1.1 | 0/1 | Not started | - |
 | 11. Search Enhancements | v1.1 | 0/? | Not started | - |
 | 12. Documentation | v1.1 | 0/? | Not started | - |

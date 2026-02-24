@@ -150,7 +150,8 @@ Plans:
   4. `run_radarr_cycle` and `run_sonarr_cycle` have tests for happy path, network failure, per-item skip-on-failure, and cursor advancement
   5. `make_search_job` has tests for client-is-None early return and exception swallowing
   6. `collect_secrets` has a test verifying all configured API keys are extracted for redaction
-**Plans:** 0 plans
+**Plans:** 2 plans
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 7 to break down)
+- [ ] 07-01-PLAN.md — Shared test fixtures (conftest.py) and ArrClient base method tests (MockTransport)
+- [ ] 07-02-PLAN.md — Search cycle, scheduler job, and collect_secrets async tests (AsyncMock)

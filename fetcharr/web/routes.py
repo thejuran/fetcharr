@@ -8,9 +8,11 @@ and partial endpoints for htmx fragment updates.
 from __future__ import annotations
 
 import os
+import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
 
+import pydantic
 import tomli_w
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -159,7 +161,7 @@ def _split_filter_param(value: str | None) -> list[str] | None:
 async def partial_history_results(request: Request) -> HTMLResponse:
     """Return the history results partial with filter and pagination support."""
     params = request.query_params
-    page = int(params.get("page", "1"))
+    page = safe_int(params.get("page"), default=1, minimum=1, maximum=10_000)
     app_filter = _split_filter_param(params.get("app"))
     queue_filter = _split_filter_param(params.get("queue"))
     outcome_filter = _split_filter_param(params.get("outcome"))
@@ -227,12 +229,17 @@ async def save_settings(request: Request) -> RedirectResponse:
     # Validate BEFORE writing to disk (QUAL-02)
     try:
         new_settings = SettingsModel(**new_config)
-    except Exception:
-        logger.warning("Invalid settings rejected -- config file unchanged")
+    except pydantic.ValidationError as exc:
+        logger.warning("Invalid settings rejected: {exc}", exc=exc)
         return RedirectResponse(url="/settings", status_code=303)
 
     # Config is valid -- write to disk
-    config_path.write_text(tomli_w.dumps(new_config))
+    content = tomli_w.dumps(new_config)
+    with tempfile.NamedTemporaryFile(mode="w", dir=config_path.parent, suffix=".tmp", delete=False) as tmp:
+        tmp.write(content)
+        tmp.flush()
+        os.fsync(tmp.fileno())
+    os.replace(tmp.name, str(config_path))
     os.chmod(config_path, 0o600)
     request.app.state.settings = new_settings
 

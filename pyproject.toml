@@ -17,6 +17,7 @@ dependencies = [
     "apscheduler>=3.11,<4",
     "jinja2",
     "aiofiles",
+    "python-multipart",
 ]
 
 [project.optional-dependencies]

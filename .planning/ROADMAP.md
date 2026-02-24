@@ -46,12 +46,12 @@ Plans:
   4. Round-robin cursor positions survive a container restart — position is read from the state file on startup, not reset to zero
   5. Unmonitored items and future air date items (Sonarr) are filtered out before being added to any search queue
   6. Search log entries record human-readable item names alongside timestamps, not just internal IDs
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 02-01: Radarr search cycle logic (round-robin cursor, batch slicing, MoviesSearch command)
-- [ ] 02-02: Sonarr search cycle logic (episode deduplication to seasons, SeasonSearch command)
-- [ ] 02-03: APScheduler integration via FastAPI lifespan, configurable intervals, state writes after each cycle
+- [ ] 02-01-PLAN.md — Config extension (search tuning fields), client search methods, and core engine utilities (filtering, batch slicing, search logging)
+- [ ] 02-02-PLAN.md — Radarr and Sonarr search cycle functions with round-robin cursors, episode-to-season deduplication, and skip-on-failure error handling
+- [ ] 02-03-PLAN.md — APScheduler integration via FastAPI lifespan, uvicorn entry point, state persistence per cycle, and search engine test suite
 
 ### Phase 3: Web UI
 **Goal**: Users can view the current automation status, recent search history, and queue positions in a browser, and can edit all settings without touching config files

@@ -15,9 +15,9 @@ Requirements for v1.2 Polish & Harden. Each maps to roadmap phases.
 
 ### Dashboard & UI
 
-- [ ] **WEBU-09**: Dashboard position labels show "X of Y" (e.g., "3 of 47") instead of bare cursor number
+- [x] **WEBU-09**: Dashboard position labels show "X of Y" (e.g., "3 of 47") instead of bare cursor number
 - [x] **WEBU-10**: Dashboard displays recent application log messages (loguru output) in a dedicated section
-- [ ] **WEBU-11**: Search log entries show detail/outcome information (not just item name and timestamp)
+- [x] **WEBU-11**: Search log entries show detail/outcome information (not just item name and timestamp)
 
 ### Search History
 
@@ -61,9 +61,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SRCH-15 | Phase 13 | Complete |
 | SRCH-16 | Phase 13 | Complete |
 | SRCH-17 | Phase 16 | Pending |
-| WEBU-09 | Phase 14 | Pending |
+| WEBU-09 | Phase 14 | Complete |
 | WEBU-10 | Phase 14 | Complete |
-| WEBU-11 | Phase 14 | Pending |
+| WEBU-11 | Phase 14 | Complete |
 | CICD-04 | Phase 13 | Complete |
 
 **Coverage:**

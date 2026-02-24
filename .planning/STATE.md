@@ -9,26 +9,26 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 
 ## Current Position
 
-Phase: 14 (second of 4 in v1.2)
+Phase: 14 (second of 4 in v1.2) -- COMPLETE
 Plan: 2 of 2 in Phase 14 complete
-Status: Phase 14 plan 02 complete (Application Log Viewer)
-Last activity: 2026-02-24 -- Completed 14-02 (Application Log Viewer)
+Status: Phase 14 complete, ready for Phase 15
+Last activity: 2026-02-24 -- Completed 14-01 (Position Labels & Search Outcomes)
 
 Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
 **Overall:**
-- Total plans completed: 25 (v1.0: 18, v1.1: 5, v1.2: 2)
+- Total plans completed: 26 (v1.0: 18, v1.1: 5, v1.2: 3)
 - Milestones shipped: 2 (v1.0, v1.1)
-- v1.2 plans completed: 3
+- v1.2 plans completed: 4
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 13-ci-search-diagnostics | 2 | 6min | 3min |
-| 14-dashboard-observability | 1 | 2min | 2min |
+| 14-dashboard-observability | 2 | 6min | 3min |
 
 *Updated after each plan completion*
 
@@ -42,6 +42,8 @@ Full decision log in PROJECT.md Key Decisions table.
 - [13-01] Switched docker job to docker/build-push-action@v6 with GHA cache backend
 - [13-02] Version detection uses /api/v3/system/status (same as validate_connection) -- no extra network call
 - [13-02] Fetched count uses raw item counts before filtering for pageSize truncation diagnosis
+- [14-01] Failed searches now insert into DB (previously only logged) -- enables outcome tracking
+- [14-01] Outcome defaults to 'searched' for backward compat with pre-migration rows
 - [14-02] Closure-based buffer sink in setup_logging for secret redaction before buffer storage
 - [14-02] LogBuffer uses explicit Lock (not just deque atomic append) for thread-safe get_recent
 - [14-02] Buffer 200 entries; log viewer displays 30 newest-first
@@ -58,5 +60,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 14-02-PLAN.md (Application Log Viewer)
+Stopped at: Completed 14-01-PLAN.md (Position Labels & Search Outcomes) -- Phase 14 complete
 Resume file: None

@@ -12,7 +12,7 @@ Fetcharr is a single-process automation daemon that cycles through Radarr and So
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Config, state, and API clients with security invariants established
+- [x] **Phase 1: Foundation** - Config, state, and API clients with security invariants established
 - [ ] **Phase 2: Search Engine** - Scheduler, round-robin, and cycle logic — the core product
 - [ ] **Phase 3: Web UI** - Status dashboard and config editor backed by real state data
 - [ ] **Phase 4: Docker** - Multi-stage packaging and release-ready artifact
@@ -31,9 +31,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Project scaffolding, config models (Pydantic + TOML), logging with redaction, and atomic JSON state store
-- [ ] 01-02-PLAN.md — httpx API clients (base + Radarr + Sonarr) with paginated list fetching and retry logic
-- [ ] 01-03-PLAN.md — Startup orchestration (entry point, validation, banner) and test suite
+- [x] 01-01-PLAN.md — Project scaffolding, config models (Pydantic + TOML), logging with redaction, and atomic JSON state store
+- [x] 01-02-PLAN.md — httpx API clients (base + Radarr + Sonarr) with paginated list fetching and retry logic
+- [x] 01-03-PLAN.md — Startup orchestration (entry point, validation, banner) and test suite
 
 ### Phase 2: Search Engine
 **Goal**: Fetcharr automatically cycles through wanted and cutoff-unmet items for both apps on a configurable schedule, with round-robin position persisted across restarts and Sonarr searching at season level
@@ -92,7 +92,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 2/3 | In Progress | - |
+| 1. Foundation | 3/3 | Complete | 2026-02-23 |
 | 2. Search Engine | 0/3 | Not started | - |
 | 3. Web UI | 0/3 | Not started | - |
 | 4. Docker | 0/1 | Not started | - |

@@ -64,6 +64,30 @@ class TestValidateArrUrl:
         assert ok is True
         assert err == ""
 
+    # W7 regression: SSRF blocklist gaps (Phase 16 code review)
+
+    def test_ipv6_loopback_blocked(self) -> None:
+        ok, err = validate_arr_url("http://[::1]:7878")
+        assert ok is False
+        assert "blocked" in err.lower()
+
+    def test_ipv4_loopback_blocked(self) -> None:
+        ok, err = validate_arr_url("http://127.0.0.1:7878")
+        assert ok is False
+        assert "blocked" in err.lower()
+
+    def test_zero_address_blocked(self) -> None:
+        ok, err = validate_arr_url("http://0.0.0.0:7878")
+        assert ok is False
+
+    def test_azure_metadata_blocked(self) -> None:
+        ok, err = validate_arr_url("http://metadata.azure.com")
+        assert ok is False
+
+    def test_alibaba_metadata_blocked(self) -> None:
+        ok, err = validate_arr_url("http://100.100.100.200")
+        assert ok is False
+
 
 # ---------------------------------------------------------------------------
 # safe_int

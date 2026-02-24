@@ -406,3 +406,26 @@ def test_dashboard_nav_has_history_link(client):
     response = client.get("/")
     assert response.status_code == 200
     assert 'href="/history"' in response.text
+
+
+# ---------------------------------------------------------------------------
+# W1 regression: XSS in hx-vals attribute (Phase 16 code review)
+# ---------------------------------------------------------------------------
+
+
+def test_history_results_hx_vals_no_single_quote_breakout(client):
+    """hx-vals uses double-quoted tojson, preventing single-quote XSS breakout."""
+    response = client.get(
+        "/partials/history-results?search=foo'+onmouseover='alert(1)"
+    )
+    assert response.status_code == 200
+    # The hx-vals attribute must use double-quote delimiters (tojson pattern)
+    assert 'hx-vals="' in response.text, "hx-vals should use double-quote delimiter"
+    assert "hx-vals='" not in response.text, "hx-vals must NOT use single-quote delimiter"
+    # Extract the hx-vals attribute value to verify XSS payload is safely escaped
+    import re
+    hx_vals_match = re.search(r'hx-vals="([^"]*)"', response.text)
+    assert hx_vals_match is not None, "hx-vals double-quoted attribute should exist"
+    hx_vals_content = hx_vals_match.group(1)
+    # Inside the hx-vals JSON, the payload must not break out as a raw attribute
+    assert "onmouseover" not in hx_vals_content, "XSS payload should not appear in hx-vals JSON"

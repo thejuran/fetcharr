@@ -309,3 +309,21 @@ async def test_get_search_history_entries_have_id(tmp_path):
     result = await get_search_history(db_path)
     assert len(result["entries"]) == 1
     assert "id" in result["entries"][0]
+
+
+# ---------------------------------------------------------------------------
+# W5 regression: ZeroDivisionError on per_page=0 (Phase 16 code review)
+# ---------------------------------------------------------------------------
+
+
+async def test_get_search_history_zero_per_page_defaults(tmp_path):
+    """per_page=0 defaults to 50 instead of causing ZeroDivisionError."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+
+    await insert_search_entry(db_path, "Radarr", "missing", "Movie A")
+
+    result = await get_search_history(db_path, per_page=0)
+    assert result["per_page"] == 50
+    assert result["total_pages"] >= 1
+    assert len(result["entries"]) == 1

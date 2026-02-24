@@ -48,7 +48,7 @@ def validate_arr_url(url: str) -> tuple[bool, str]:
 
     try:
         addr = ipaddress.ip_address(hostname)
-        if addr.is_link_local or addr.is_loopback:
+        if addr.is_link_local or addr.is_loopback or addr.is_unspecified:
             return (False, "Blocked address")
     except ValueError:
         # Not an IP literal (e.g. "radarr") -- perfectly fine.

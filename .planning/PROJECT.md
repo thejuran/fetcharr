@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A lightweight Docker-based tool that automates searches in Radarr and Sonarr for wanted and cutoff unmet items. It performs configurable round-robin searches at configurable intervals with a dark theme web UI for status monitoring and config editing. Built with Python/FastAPI and htmx/Jinja2. Zero credential exposure by design.
+A lightweight Docker-based tool that automates searches in Radarr and Sonarr for wanted and cutoff unmet items. Configurable round-robin searches at configurable intervals with a dark theme web UI for status monitoring and config editing. Includes CI/CD pipeline, automated GHCR publishing, SQLite search history, and comprehensive documentation. Built with Python/FastAPI and htmx/Jinja2. Zero credential exposure by design.
 
 ## Core Value
 
@@ -28,27 +28,16 @@ Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible 
 - ✓ Docker deployment with PUID/PGID, least-privilege, HEALTHCHECK — v1.0
 - ✓ State recovery, schema migration, race condition serialization — v1.0
 - ✓ 115 tests covering all async paths — v1.0
+- ✓ README with install guide, config reference, and security model — v1.1
+- ✓ GitHub Actions CI (pytest, lint, Docker build validation) — v1.1
+- ✓ Docker release pipeline — dev tag on push, latest + version on release (ghcr.io) — v1.1
+- ✓ Local deep code review convention (Claude offers /deep-review before push) — v1.1
+- ✓ Configurable hard limit / safety ceiling on max items per cycle — v1.1
+- ✓ Persistent search history beyond in-memory log (SQLite storage) — v1.1
 
 ### Active
 
-- [ ] README with install guide, config reference, and security model
-- [ ] GitHub Actions CI (pytest, lint, Docker build validation)
-- [ ] Docker release pipeline — dev tag on push, latest + version on release (ghcr.io)
-- [ ] Local deep code review convention (Claude offers /deep-review before push)
-- [ ] Configurable hard limit / safety ceiling on max items per cycle
-- [ ] Persistent search history beyond in-memory log (SQLite storage)
-
-## Current Milestone: v1.1 Ship & Document
-
-**Goal:** Make Fetcharr installable by others — README, CI/CD, automated Docker releases, plus small feature additions.
-
-**Target features:**
-- README and documentation for GitHub
-- GitHub Actions CI pipeline (tests, lint, Docker build)
-- Docker image release strategy (dev/latest/versioned on ghcr.io)
-- Deep code review convention before pushing
-- Hard limit on items per cycle
-- Persistent search history (SQLite)
+(None — planning next milestone)
 
 ### Out of Scope
 
@@ -64,15 +53,18 @@ Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible 
 
 ## Context
 
-Shipped v1.0 with ~3,672 Python + ~213 HTML LOC. 115 tests passing.
-Tech stack: Python 3.13, FastAPI, httpx, Pydantic, APScheduler, Jinja2, htmx, Tailwind CSS v4, loguru.
+Shipped v1.1 with ~4,012 Python LOC. 115+ tests passing.
+Tech stack: Python 3.13, FastAPI, httpx, Pydantic, APScheduler, aiosqlite, Jinja2, htmx, Tailwind CSS v4, loguru, ruff.
 Docker: multi-stage build with pytailwindcss builder, python:3.13-slim production, PUID/PGID entrypoint.
+CI/CD: GitHub Actions (pytest, ruff, Docker build validation) + GHCR release workflow.
+Registry: ghcr.io/thejuran/fetcharr
 
 Replaces Huntarr's core search functionality without the security liabilities (plaintext passwords, unauthenticated API key exposure, 2FA bypass). Deliberately minimal attack surface.
 
 Known concerns for next milestone:
 - Sonarr v3 vs v4 API version detection (currently works via Content-Type header)
 - pageSize ceiling logging for large libraries
+- Search history UI with filtering/pagination (SRCH-14 deferred from v1.1)
 
 ## Constraints
 
@@ -96,6 +88,14 @@ Known concerns for next milestone:
 | Origin/Referer CSRF over tokens | No auth/sessions means no cookies to protect | ✓ Good |
 | Vendored htmx over CDN | Reproducible builds, no external dependency | ✓ Good |
 | Custom loguru sink for redaction | Filter only sees message, sink sees full output including tracebacks | ✓ Good |
+| Ruff rule sets E,F,I,UP,B,SIM | Comprehensive but non-noisy linting | ✓ Good — caught 32 violations at adoption |
+| Three parallel CI jobs | No inter-job deps for fastest feedback | ✓ Good |
+| docker/metadata-action for tags | Avoids manual shell scripting for GHCR tags | ✓ Good |
+| BuildKit GHA cache | Faster Docker rebuilds in CI | ✓ Good |
+| Proportional hard max split | floor(missing/total*max) for missing, remainder for cutoff | ✓ Good |
+| Connection-per-op SQLite | aiosqlite context manager per function call | ✓ Good |
+| Auto-prune at 500 rows | DELETE after each insert keeps DB bounded | ✓ Good |
+| Docker Compose only install | No docker run or bare-metal instructions | ✓ Good — simplest path |
 
 ---
-*Last updated: 2026-02-24 after v1.1 milestone start*
+*Last updated: 2026-02-24 after v1.1 milestone*

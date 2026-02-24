@@ -19,3 +19,22 @@
 
 ---
 
+
+## v1.1 Ship & Document (Shipped: 2026-02-24)
+
+**Phases completed:** 4 phases, 5 plans
+**Timeline:** 2026-02-24 (same day as v1.0)
+**Git range:** v1.0..HEAD (30 commits)
+**Files:** 49 files changed, +4,192 -173 lines
+
+**Delivered:** CI/CD pipeline, automated Docker releases to GHCR, search enhancements (hard max cap + SQLite history), and comprehensive README documentation.
+
+**Key accomplishments:**
+- GitHub Actions CI with pytest, ruff linting, and Docker build validation in three parallel jobs
+- Automated GHCR publishing — `:dev` on push to main, `:latest` + version tag on release
+- Hard max items per cycle with proportional batch capping and settings UI integration
+- SQLite persistent search history with auto-migration from JSON and 500-row auto-pruning
+- Complete README with Docker install guide, TOML config reference, security model, and screenshot placeholders
+
+---
+

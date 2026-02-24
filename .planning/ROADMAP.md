@@ -6,36 +6,105 @@ Fetcharr is a single-process automation daemon that cycles through Radarr and So
 
 ## Milestones
 
-- ✅ **v1.0 MVP** — Phases 1-8 (shipped 2026-02-24) — [archive](milestones/v1.0-ROADMAP.md)
-- ✅ **v1.1 Ship & Document** — Phases 9-12 (shipped 2026-02-24) — [archive](milestones/v1.1-ROADMAP.md)
+- v1.0 MVP -- Phases 1-8 (shipped 2026-02-24) -- [archive](milestones/v1.0-ROADMAP.md)
+- v1.1 Ship & Document -- Phases 9-12 (shipped 2026-02-24) -- [archive](milestones/v1.1-ROADMAP.md)
+- **v1.2 Polish & Harden** -- Phases 13-16 (in progress)
 
 ## Phases
 
 <details>
-<summary>✅ v1.0 MVP (Phases 1-8) — SHIPPED 2026-02-24</summary>
+<summary>v1.0 MVP (Phases 1-8) -- SHIPPED 2026-02-24</summary>
 
-- [x] Phase 1: Foundation (3/3 plans) — completed 2026-02-23
-- [x] Phase 2: Search Engine (3/3 plans) — completed 2026-02-24
-- [x] Phase 3: Web UI (3/3 plans) — completed 2026-02-24
-- [x] Phase 4: Docker (1/1 plan) — completed 2026-02-24
-- [x] Phase 5: Security Hardening (2/2 plans) — completed 2026-02-24
-- [x] Phase 6: Bug Fixes & Resilience (3/3 plans) — completed 2026-02-24
-- [x] Phase 7: Test Coverage (2/2 plans) — completed 2026-02-24
-- [x] Phase 8: Tech Debt Cleanup (1/1 plan) — completed 2026-02-24
+- [x] Phase 1: Foundation (3/3 plans) -- completed 2026-02-23
+- [x] Phase 2: Search Engine (3/3 plans) -- completed 2026-02-24
+- [x] Phase 3: Web UI (3/3 plans) -- completed 2026-02-24
+- [x] Phase 4: Docker (1/1 plan) -- completed 2026-02-24
+- [x] Phase 5: Security Hardening (2/2 plans) -- completed 2026-02-24
+- [x] Phase 6: Bug Fixes & Resilience (3/3 plans) -- completed 2026-02-24
+- [x] Phase 7: Test Coverage (2/2 plans) -- completed 2026-02-24
+- [x] Phase 8: Tech Debt Cleanup (1/1 plan) -- completed 2026-02-24
 
 </details>
 
 <details>
-<summary>✅ v1.1 Ship & Document (Phases 9-12) — SHIPPED 2026-02-24</summary>
+<summary>v1.1 Ship & Document (Phases 9-12) -- SHIPPED 2026-02-24</summary>
 
-- [x] Phase 9: CI/CD Pipeline (1/1 plan) — completed 2026-02-24
-- [x] Phase 10: Release Pipeline (1/1 plan) — completed 2026-02-24
-- [x] Phase 11: Search Enhancements (2/2 plans) — completed 2026-02-24
-- [x] Phase 12: Documentation (1/1 plan) — completed 2026-02-24
+- [x] Phase 9: CI/CD Pipeline (1/1 plan) -- completed 2026-02-24
+- [x] Phase 10: Release Pipeline (1/1 plan) -- completed 2026-02-24
+- [x] Phase 11: Search Enhancements (2/2 plans) -- completed 2026-02-24
+- [x] Phase 12: Documentation (1/1 plan) -- completed 2026-02-24
 
 </details>
 
+### v1.2 Polish & Harden
+
+**Milestone Goal:** Harden search resilience, improve dashboard observability, and ship CI to GitHub.
+
+- [ ] **Phase 13: CI & Search Diagnostics** - Push CI to GitHub and add backend search diagnostic logging
+- [ ] **Phase 14: Dashboard Observability** - Enhance dashboard with position progress, app logs, and search detail
+- [ ] **Phase 15: Search History UI** - Browsable search history with filtering and pagination
+- [ ] **Phase 16: Sonarr Episode Fallback** - Automatic episode-level retry when season search fails
+
+## Phase Details
+
+### Phase 13: CI & Search Diagnostics
+**Goal**: CI runs on GitHub remote runners and search cycles produce diagnostic logs for troubleshooting
+**Depends on**: Phase 12
+**Requirements**: CICD-04, SRCH-15, SRCH-16
+**Success Criteria** (what must be TRUE):
+  1. CI workflow runs on GitHub Actions and all tests pass on remote runners
+  2. Fetcharr logs the detected Sonarr API version (v3 or v4) at startup
+  3. Each search cycle logs the total item count fetched so users can detect pageSize truncation in large libraries
+**Plans**: TBD
+
+Plans:
+- [ ] 13-01: TBD
+- [ ] 13-02: TBD
+
+### Phase 14: Dashboard Observability
+**Goal**: Users can see detailed search progress, outcomes, and application logs directly in the web dashboard
+**Depends on**: Phase 13
+**Requirements**: WEBU-09, WEBU-10, WEBU-11
+**Success Criteria** (what must be TRUE):
+  1. Dashboard position labels display "X of Y" format (e.g., "3 of 47") instead of bare cursor numbers
+  2. A dedicated section in the dashboard shows recent application log messages from loguru
+  3. Search log entries display outcome/detail information (e.g., search triggered, error encountered) alongside item name and timestamp
+**Plans**: TBD
+
+Plans:
+- [ ] 14-01: TBD
+- [ ] 14-02: TBD
+
+### Phase 15: Search History UI
+**Goal**: Users can browse and filter their complete search history beyond the dashboard's recent log
+**Depends on**: Phase 14
+**Requirements**: SRCH-14
+**Success Criteria** (what must be TRUE):
+  1. User can navigate to a search history page from the dashboard
+  2. User can filter search history by app (Radarr/Sonarr) and queue type (missing/cutoff)
+  3. Search history displays with pagination so large histories remain navigable
+**Plans**: TBD
+
+Plans:
+- [ ] 15-01: TBD
+
+### Phase 16: Sonarr Episode Fallback
+**Goal**: Sonarr searches recover automatically when season-level search fails by retrying at episode granularity
+**Depends on**: Phase 13
+**Requirements**: SRCH-17
+**Success Criteria** (what must be TRUE):
+  1. When a Sonarr SeasonSearch command fails or returns an error, Fetcharr automatically retries with individual EpisodeSearch commands for that season's episodes
+  2. Episode fallback events are logged so users can see when and why fallback was triggered
+  3. The fallback does not re-search episodes that are already downloaded
+**Plans**: TBD
+
+Plans:
+- [ ] 16-01: TBD
+
 ## Progress
+
+**Execution Order:**
+Phases execute in numeric order: 13 -> 14 -> 15 -> 16
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -51,3 +120,7 @@ Fetcharr is a single-process automation daemon that cycles through Radarr and So
 | 10. Release Pipeline | v1.1 | 1/1 | Complete | 2026-02-24 |
 | 11. Search Enhancements | v1.1 | 2/2 | Complete | 2026-02-24 |
 | 12. Documentation | v1.1 | 1/1 | Complete | 2026-02-24 |
+| 13. CI & Search Diagnostics | v1.2 | 0/TBD | Not started | - |
+| 14. Dashboard Observability | v1.2 | 0/TBD | Not started | - |
+| 15. Search History UI | v1.2 | 0/TBD | Not started | - |
+| 16. Sonarr Episode Fallback | v1.2 | 0/TBD | Not started | - |

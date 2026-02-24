@@ -57,20 +57,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SRCH-14 | — | Pending |
-| SRCH-15 | — | Pending |
-| SRCH-16 | — | Pending |
-| SRCH-17 | — | Pending |
-| WEBU-09 | — | Pending |
-| WEBU-10 | — | Pending |
-| WEBU-11 | — | Pending |
-| CICD-04 | — | Pending |
+| SRCH-14 | Phase 15 | Pending |
+| SRCH-15 | Phase 13 | Pending |
+| SRCH-16 | Phase 13 | Pending |
+| SRCH-17 | Phase 16 | Pending |
+| WEBU-09 | Phase 14 | Pending |
+| WEBU-10 | Phase 14 | Pending |
+| WEBU-11 | Phase 14 | Pending |
+| CICD-04 | Phase 13 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 8 total
-- Mapped to phases: 0
-- Unmapped: 8
+- Mapped to phases: 8
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-24 after initial definition*
+*Last updated: 2026-02-24 after roadmap creation*

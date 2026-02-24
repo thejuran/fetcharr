@@ -19,7 +19,6 @@ from loguru import logger
 
 from fetcharr.clients.radarr import RadarrClient
 from fetcharr.clients.sonarr import SonarrClient
-from fetcharr.config import load_settings
 from fetcharr.logging import setup_logging
 from fetcharr.models.config import Settings as SettingsModel
 from fetcharr.search.engine import run_radarr_cycle, run_sonarr_cycle

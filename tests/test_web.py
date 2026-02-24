@@ -150,21 +150,8 @@ def test_search_log_partial_returns_200(client):
     assert response.status_code == 200, f"Expected 200, got {response.status_code}"
 
 
-@patch("fetcharr.web.routes.load_settings")
-def test_save_settings_writes_toml(mock_load, client, test_app, tmp_path):
+def test_save_settings_writes_toml(client, test_app, tmp_path):
     """POST /settings writes TOML to config_path and redirects (303)."""
-    # Make load_settings return a mock that satisfies the validator
-    mock_new_settings = MagicMock()
-    mock_new_settings.radarr.enabled = True
-    mock_new_settings.radarr.url = "http://radarr:7878"
-    mock_new_settings.radarr.api_key.get_secret_value.return_value = "test-radarr-key"
-    mock_new_settings.radarr.search_interval = 30
-    mock_new_settings.sonarr.enabled = False
-    mock_new_settings.sonarr.url = ""
-    mock_new_settings.sonarr.api_key.get_secret_value.return_value = ""
-    mock_new_settings.sonarr.search_interval = 30
-    mock_load.return_value = mock_new_settings
-
     response = client.post(
         "/settings",
         data={
@@ -194,20 +181,8 @@ def test_save_settings_writes_toml(mock_load, client, test_app, tmp_path):
     assert "new-key" in content, "TOML should contain the new API key"
 
 
-@patch("fetcharr.web.routes.load_settings")
-def test_save_settings_preserves_existing_api_key(mock_load, client, test_app, tmp_path):
+def test_save_settings_preserves_existing_api_key(client, test_app, tmp_path):
     """POST /settings with empty api_key field preserves the existing key."""
-    mock_new_settings = MagicMock()
-    mock_new_settings.radarr.enabled = True
-    mock_new_settings.radarr.url = "http://radarr:7878"
-    mock_new_settings.radarr.api_key.get_secret_value.return_value = "test-radarr-key"
-    mock_new_settings.radarr.search_interval = 30
-    mock_new_settings.sonarr.enabled = True
-    mock_new_settings.sonarr.url = "http://sonarr:8989"
-    mock_new_settings.sonarr.api_key.get_secret_value.return_value = "test-sonarr-key"
-    mock_new_settings.sonarr.search_interval = 30
-    mock_load.return_value = mock_new_settings
-
     response = client.post(
         "/settings",
         data={
@@ -235,20 +210,8 @@ def test_save_settings_preserves_existing_api_key(mock_load, client, test_app, t
     assert "test-sonarr-key" in content, "Existing sonarr key should be preserved"
 
 
-@patch("fetcharr.web.routes.load_settings")
-def test_save_settings_replaces_api_key_when_provided(mock_load, client, test_app, tmp_path):
+def test_save_settings_replaces_api_key_when_provided(client, test_app, tmp_path):
     """POST /settings with new api_key value writes the new key to TOML."""
-    mock_new_settings = MagicMock()
-    mock_new_settings.radarr.enabled = True
-    mock_new_settings.radarr.url = "http://radarr:7878"
-    mock_new_settings.radarr.api_key.get_secret_value.return_value = "brand-new-key"
-    mock_new_settings.radarr.search_interval = 30
-    mock_new_settings.sonarr.enabled = True
-    mock_new_settings.sonarr.url = "http://sonarr:8989"
-    mock_new_settings.sonarr.api_key.get_secret_value.return_value = "test-sonarr-key"
-    mock_new_settings.sonarr.search_interval = 30
-    mock_load.return_value = mock_new_settings
-
     response = client.post(
         "/settings",
         data={

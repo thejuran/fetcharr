@@ -30,9 +30,8 @@ class OriginCheckMiddleware(BaseHTTPMiddleware):
             if origin:
                 if urlparse(origin).netloc != host:
                     return Response("Forbidden", status_code=403)
-            elif referer:
-                if urlparse(referer).netloc != host:
-                    return Response("Forbidden", status_code=403)
+            elif referer and urlparse(referer).netloc != host:
+                return Response("Forbidden", status_code=403)
             # Neither header present: allow (same-origin browser behavior)
 
         return await call_next(request)

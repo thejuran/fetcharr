@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-import pytest
-
 from fetcharr.web.validation import safe_int, safe_log_level, validate_arr_url
-
 
 # ---------------------------------------------------------------------------
 # validate_arr_url

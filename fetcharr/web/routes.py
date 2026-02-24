@@ -8,7 +8,7 @@ and partial endpoints for htmx fragment updates.
 from __future__ import annotations
 
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import tomli_w
@@ -225,7 +225,7 @@ async def save_settings(request: Request) -> RedirectResponse:
                     "interval",
                     minutes=new_cfg.search_interval,
                     id=job_id,
-                    next_run_time=datetime.now(timezone.utc),
+                    next_run_time=datetime.now(UTC),
                 )
                 logger.info(
                     "Enabled {name} search every {interval}m",

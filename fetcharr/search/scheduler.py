@@ -10,10 +10,10 @@ capturing variables, enabling future hot-reload of clients and settings.
 from __future__ import annotations
 
 import asyncio
+from collections.abc import AsyncIterator, Callable, Coroutine
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import AsyncIterator, Callable, Coroutine
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI
@@ -128,7 +128,7 @@ def create_lifespan(
                     "interval",
                     minutes=app_config.search_interval,
                     id=f"{name}_search",
-                    next_run_time=datetime.now(timezone.utc),
+                    next_run_time=datetime.now(UTC),
                 )
                 logger.info(
                     "Scheduled {app} search every {interval}m (first run: now)",

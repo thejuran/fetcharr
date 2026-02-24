@@ -7,6 +7,7 @@ to prevent corruption if the process crashes mid-write.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import tempfile
@@ -114,8 +115,6 @@ def save_state(state: FetcharrState, state_path: Path = STATE_PATH) -> None:
     try:
         os.replace(tmp.name, state_path)
     except OSError:
-        try:
+        with contextlib.suppress(OSError):
             os.unlink(tmp.name)
-        except OSError:
-            pass
         raise

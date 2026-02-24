@@ -157,9 +157,11 @@ def test_save_state_cleans_temp_on_replace_failure(tmp_path: Path) -> None:
         search_log=[],
     )
 
-    with patch("fetcharr.state.os.replace", side_effect=OSError("mock failure")):
-        with pytest.raises(OSError, match="mock failure"):
-            save_state(state, state_file)
+    with (
+        patch("fetcharr.state.os.replace", side_effect=OSError("mock failure")),
+        pytest.raises(OSError, match="mock failure"),
+    ):
+        save_state(state, state_file)
 
     # No .tmp files should remain after the failure
     tmp_files = list(tmp_path.glob("*.tmp"))

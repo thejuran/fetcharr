@@ -7,8 +7,7 @@ from pathlib import Path
 import pytest
 
 from fetcharr.config import ensure_config, generate_default_config, load_settings
-from fetcharr.models.config import ArrConfig, Settings
-
+from fetcharr.models.config import ArrConfig
 
 VALID_TOML = """\
 [general]

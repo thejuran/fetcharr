@@ -25,6 +25,7 @@ dev = [
     "pytest",
     "pytest-asyncio",
     "pytailwindcss",
+    "ruff",
 ]
 
 [project.scripts]
@@ -32,3 +33,10 @@ fetcharr = "fetcharr.__main__:main"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]

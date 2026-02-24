@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
-import json
 from unittest.mock import AsyncMock, patch
 
 import httpx
@@ -122,9 +120,8 @@ async def test_request_with_retry_reraises_when_retry_fails() -> None:
     client._app_name = "Test"
     client._client = httpx.AsyncClient(transport=transport, base_url="http://test")
     try:
-        with patch("asyncio.sleep", new_callable=AsyncMock):
-            with pytest.raises(httpx.HTTPStatusError):
-                await client._request_with_retry("GET", "/test")
+        with patch("asyncio.sleep", new_callable=AsyncMock), pytest.raises(httpx.HTTPStatusError):
+            await client._request_with_retry("GET", "/test")
     finally:
         await client.close()
 

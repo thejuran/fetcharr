@@ -18,7 +18,6 @@ from fetcharr.config import ensure_config
 from fetcharr.logging import setup_logging
 from fetcharr.models.config import CONFIG_PATH, Settings
 
-
 LOCALHOST_PATTERNS = {"localhost", "127.0.0.1", "::1"}
 
 

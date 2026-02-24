@@ -10,7 +10,7 @@ cursor advancement) for both run_radarr_cycle and run_sonarr_cycle.
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock
 
 import httpx
@@ -27,7 +27,6 @@ from fetcharr.search.engine import (
 )
 from fetcharr.state import _default_state
 from tests.conftest import make_settings
-
 
 # ---------------------------------------------------------------------------
 # filter_monitored
@@ -192,7 +191,7 @@ def test_filter_sonarr_episodes_excludes_unmonitored():
 
 
 def test_filter_sonarr_episodes_excludes_future_air_date():
-    future = (datetime.now(timezone.utc) + timedelta(days=30)).isoformat().replace("+00:00", "Z")
+    future = (datetime.now(UTC) + timedelta(days=30)).isoformat().replace("+00:00", "Z")
     episodes = [_make_episode(air_date_utc=future)]
     assert filter_sonarr_episodes(episodes) == []
 

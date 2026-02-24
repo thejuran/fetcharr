@@ -7,7 +7,7 @@ drive the automated search behaviour for Radarr and Sonarr.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import httpx
 import pydantic
@@ -76,7 +76,7 @@ def append_search_log(
     """
     entry = {
         "name": item_name,
-        "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "timestamp": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "app": app,
         "queue_type": queue_type,
     }
@@ -130,7 +130,7 @@ def filter_sonarr_episodes(episodes: list[dict]) -> list[dict]:
     Returns:
         Only monitored episodes with a past air date.
     """
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     result: list[dict] = []
     for ep in episodes:
         if not ep.get("monitored", False):
@@ -179,7 +179,7 @@ async def run_radarr_cycle(
         state["radarr"]["connected"] = False
         if not state["radarr"].get("unreachable_since"):
             state["radarr"]["unreachable_since"] = (
-                datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+                datetime.now(UTC).isoformat().replace("+00:00", "Z")
             )
         return state
 
@@ -226,7 +226,7 @@ async def run_radarr_cycle(
     state["radarr"]["cutoff_cursor"] = new_cursor
 
     # --- Update last_run ---
-    state["radarr"]["last_run"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    state["radarr"]["last_run"] = datetime.now(UTC).isoformat().replace("+00:00", "Z")
     return state
 
 
@@ -262,7 +262,7 @@ async def run_sonarr_cycle(
         state["sonarr"]["connected"] = False
         if not state["sonarr"].get("unreachable_since"):
             state["sonarr"]["unreachable_since"] = (
-                datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+                datetime.now(UTC).isoformat().replace("+00:00", "Z")
             )
         return state
 
@@ -311,5 +311,5 @@ async def run_sonarr_cycle(
     state["sonarr"]["cutoff_cursor"] = new_cursor
 
     # --- Update last_run ---
-    state["sonarr"]["last_run"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    state["sonarr"]["last_run"] = datetime.now(UTC).isoformat().replace("+00:00", "Z")
     return state

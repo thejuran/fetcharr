@@ -80,10 +80,10 @@ Plans:
   2. Config and state files live on a named Docker volume and survive container recreation
   3. No API keys or config values are baked into the Docker image layers — all credentials are runtime-only via the volume-mounted config file
   4. Startup emits a clear error (not a silent hang) if the *arr URLs are configured as localhost (a common Docker networking mistake)
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 04-01: Multi-stage Dockerfile (pytailwindcss builder stage, slim production image) and docker-compose.yml with volume configuration
+- [ ] 04-01-PLAN.md — Multi-stage Dockerfile (pytailwindcss builder + slim production), docker-compose.yml, PUID/PGID entrypoint, HEALTHCHECK, and localhost URL detection
 
 ## Progress
 

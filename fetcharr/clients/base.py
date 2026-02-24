@@ -6,6 +6,7 @@ import asyncio
 from typing import Any
 
 import httpx
+import pydantic
 from loguru import logger
 
 from fetcharr.models.arr import PaginatedResponse, SystemStatus
@@ -46,7 +47,7 @@ class ArrClient:
             response = await self._client.request(method, path, **kwargs)
             response.raise_for_status()
             return response
-        except (httpx.HTTPStatusError, httpx.ConnectError, httpx.TimeoutException):
+        except (httpx.HTTPStatusError, httpx.TransportError):
             logger.debug(
                 "{app}: Request to {path} failed, retrying in 2s",
                 app=self._app_name,
@@ -57,11 +58,7 @@ class ArrClient:
                 response = await self._client.request(method, path, **kwargs)
                 response.raise_for_status()
                 return response
-            except (
-                httpx.HTTPStatusError,
-                httpx.ConnectError,
-                httpx.TimeoutException,
-            ) as exc:
+            except (httpx.HTTPStatusError, httpx.TransportError) as exc:
                 logger.warning(
                     "{app}: Retry failed for {path}: {exc}",
                     app=self._app_name,
@@ -177,6 +174,13 @@ class ArrClient:
             logger.warning(
                 "{app}: Connection timed out (30s)",
                 app=self._app_name,
+            )
+            return False
+        except pydantic.ValidationError as exc:
+            logger.warning(
+                "{app}: Unexpected API response format: {exc}",
+                app=self._app_name,
+                exc=exc,
             )
             return False
 

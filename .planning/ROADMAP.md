@@ -8,7 +8,7 @@ Fetcharr is a single-process automation daemon that cycles through Radarr and So
 
 - v1.0 MVP -- Phases 1-8 (shipped 2026-02-24) -- [archive](milestones/v1.0-ROADMAP.md)
 - v1.1 Ship & Document -- Phases 9-12 (shipped 2026-02-24) -- [archive](milestones/v1.1-ROADMAP.md)
-- **v1.2 Polish & Harden** -- Phases 13-15 (in progress)
+- **v1.2 Polish & Harden** -- Phases 13-16 (in progress)
 
 ## Phases
 
@@ -43,8 +43,23 @@ Fetcharr is a single-process automation daemon that cycles through Radarr and So
 - [x] **Phase 13: CI & Search Diagnostics** - Push CI to GitHub and add backend search diagnostic logging (completed 2026-02-24)
 - [x] **Phase 14: Dashboard Observability** - Enhance dashboard with position progress, app logs, and search detail (completed 2026-02-24)
 - [x] **Phase 15: Search History UI** - Browsable search history with filtering and pagination (completed 2026-02-24)
+- [ ] **Phase 16: Deep Code Review** - Comprehensive code review of v1.2 changes with fix recommendations
 
 ## Phase Details
+
+### Phase 16: Deep Code Review
+**Goal**: All warning-level (80+) issues from v1.2 code review are fixed and documented
+**Depends on**: Phase 15
+**Success Criteria** (what must be TRUE):
+  1. All warning-level (80+) issues from the review are addressed
+  2. All CLAUDE.md compliance violations are fixed
+  3. Tests pass after fixes (`pytest tests/ -x`)
+**Plans**: 2 plans
+**Report**: [16-REVIEW.md](phases/16-deep-code-review/16-REVIEW.md)
+
+Plans:
+- [ ] 16-01-PLAN.md -- Security and DB fixes (W1 XSS, W4 cursors, W5 zero division, W7 SSRF) with regression tests
+- [ ] 16-02-PLAN.md -- Routes fixes (W2 atomic write, W3 page validation, W8 narrow except) and review doc update
 
 ### Phase 13: CI & Search Diagnostics
 **Goal**: CI runs on GitHub remote runners and search cycles produce diagnostic logs for troubleshooting
@@ -88,11 +103,10 @@ Plans:
 - [ ] 15-01-PLAN.md -- Backend query with filtering/pagination, history page template, nav link, htmx partial
 - [ ] 15-02-PLAN.md -- Tests for search history query, route, and template rendering
 
-
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 13 -> 14 -> 15
+Phases execute in numeric order: 13 -> 14 -> 15 -> 16
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -111,3 +125,4 @@ Phases execute in numeric order: 13 -> 14 -> 15
 | 13. CI & Search Diagnostics | 2/2 | Complete    | 2026-02-24 | - |
 | 14. Dashboard Observability | 2/2 | Complete    | 2026-02-24 | - |
 | 15. Search History UI | 2/2 | Complete    | 2026-02-24 | - |
+| 16. Deep Code Review | 0/2 | Pending     | -          | - |

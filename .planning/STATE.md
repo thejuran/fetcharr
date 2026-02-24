@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 1 of 4 (Foundation)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: Executing
-Last activity: 2026-02-23 — Completed 01-01-PLAN.md (project scaffolding, config, logging, state)
+Last activity: 2026-02-23 — Completed 01-02-PLAN.md (httpx API clients for Radarr and Sonarr)
 
-Progress: [███░░░░░░░] 10%
+Progress: [██████░░░░] 20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 4min
-- Total execution time: 4min
+- Total plans completed: 2
+- Average duration: 3min
+- Total execution time: 6min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1. Foundation | 1/3 | 4min | 4min |
+| 1. Foundation | 2/3 | 6min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4min)
-- Trend: Starting
+- Last 5 plans: 01-01 (4min), 01-02 (2min)
+- Trend: Accelerating
 
 *Updated after each plan completion*
 
@@ -49,6 +49,9 @@ Recent decisions affecting current work:
 - [01-01]: Settings loads via init_settings + TomlConfigSettingsSource for testability with arbitrary TOML paths
 - [01-01]: Config loader reads TOML via tomllib and passes parsed data as init kwargs for path flexibility
 - [01-01]: Default config uses plain text template to preserve inline comments
+- [01-02]: Content-Type: application/json set on all requests for Sonarr v4 compatibility
+- [01-02]: validate_connection calls system/status directly (no retry) for clear startup diagnostics
+- [01-02]: Pagination terminates on zero records OR page*pageSize >= totalRecords
 
 ### Pending Todos
 
@@ -62,5 +65,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Completed 01-01-PLAN.md
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None

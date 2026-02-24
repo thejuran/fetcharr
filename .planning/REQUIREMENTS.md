@@ -22,14 +22,14 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **SRCH-06**: Sonarr searches trigger at season level using SeasonSearch command
 - [ ] **SRCH-07**: Missing and cutoff queues are separate per app with independent cursors
 - [ ] **SRCH-08**: Round-robin cursor positions persist across container restarts
-- [ ] **SRCH-09**: Unmonitored items are filtered out before adding to search queue
+- [x] **SRCH-09**: Unmonitored items are filtered out before adding to search queue
 - [ ] **SRCH-10**: Future air date items are filtered out of Sonarr queues
-- [ ] **SRCH-11**: Search log entries show human-readable item names, not just IDs
+- [x] **SRCH-11**: Search log entries show human-readable item names, not just IDs
 
 ### Configuration
 
-- [ ] **CONF-01**: User can configure number of items to search per cycle, per app (separate missing/cutoff counts)
-- [ ] **CONF-02**: User can configure search interval per app
+- [x] **CONF-01**: User can configure number of items to search per cycle, per app (separate missing/cutoff counts)
+- [x] **CONF-02**: User can configure search interval per app
 
 ### Web UI
 
@@ -98,11 +98,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SRCH-06 | Phase 2 | Pending |
 | SRCH-07 | Phase 2 | Pending |
 | SRCH-08 | Phase 2 | Pending |
-| SRCH-09 | Phase 2 | Pending |
+| SRCH-09 | Phase 2 | Complete |
 | SRCH-10 | Phase 2 | Pending |
-| SRCH-11 | Phase 2 | Pending |
-| CONF-01 | Phase 2 | Pending |
-| CONF-02 | Phase 2 | Pending |
+| SRCH-11 | Phase 2 | Complete |
+| CONF-01 | Phase 2 | Complete |
+| CONF-02 | Phase 2 | Complete |
 | WEBU-01 | Phase 3 | Pending |
 | WEBU-02 | Phase 3 | Pending |
 | WEBU-03 | Phase 3 | Pending |

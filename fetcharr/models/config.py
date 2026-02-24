@@ -27,6 +27,7 @@ class GeneralConfig(BaseModel):
     """Global application settings."""
 
     log_level: str = "info"
+    hard_max_per_cycle: int = 0  # 0 = unlimited; caps total items per app per cycle
 
 
 class Settings(BaseSettings):

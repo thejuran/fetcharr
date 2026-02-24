@@ -21,6 +21,33 @@ from fetcharr.state import FetcharrState
 SEARCH_LOG_MAX = 50
 
 
+def cap_batch_sizes(missing_count: int, cutoff_count: int, hard_max: int) -> tuple[int, int]:
+    """Cap total batch sizes to a hard maximum, splitting proportionally.
+
+    When ``hard_max`` is 0 or negative (unlimited), the inputs are returned
+    unchanged.  Otherwise the combined total is capped at ``hard_max`` with
+    a proportional split: missing gets ``floor(missing / total * hard_max)``
+    and cutoff gets the remainder, ensuring the cap is not exceeded.
+
+    Args:
+        missing_count: Requested missing-queue batch size.
+        cutoff_count: Requested cutoff-queue batch size.
+        hard_max: Maximum combined items (0 = unlimited).
+
+    Returns:
+        Tuple of (effective_missing, effective_cutoff).
+    """
+    if hard_max <= 0:
+        return (missing_count, cutoff_count)
+    total_requested = missing_count + cutoff_count
+    if total_requested <= hard_max:
+        return (missing_count, cutoff_count)
+    # Proportional split, round down for missing, remainder to cutoff
+    effective_missing = max(0, (missing_count * hard_max) // total_requested)
+    effective_cutoff = hard_max - effective_missing
+    return (effective_missing, effective_cutoff)
+
+
 def filter_monitored(items: list[dict]) -> list[dict]:
     """Filter out items where ``monitored`` is not True.
 
@@ -191,10 +218,23 @@ async def run_radarr_cycle(
     state["radarr"]["missing_count"] = len(missing)
     state["radarr"]["cutoff_count"] = len(cutoff)
 
+    # Apply hard max cap (SRCH-12)
+    missing_limit = settings.radarr.search_missing_count
+    cutoff_limit = settings.radarr.search_cutoff_count
+    hard_max = settings.general.hard_max_per_cycle
+    missing_limit, cutoff_limit = cap_batch_sizes(missing_limit, cutoff_limit, hard_max)
+    if hard_max > 0 and (missing_limit != settings.radarr.search_missing_count or cutoff_limit != settings.radarr.search_cutoff_count):
+        logger.debug(
+            "Radarr: Hard max {max} applied -- missing={m}, cutoff={c}",
+            max=hard_max,
+            m=missing_limit,
+            c=cutoff_limit,
+        )
+
     # --- Missing queue ---
     missing = filter_monitored(missing)
     cursor = state["radarr"]["missing_cursor"]
-    batch, new_cursor = slice_batch(missing, cursor, settings.radarr.search_missing_count)
+    batch, new_cursor = slice_batch(missing, cursor, missing_limit)
     for movie in batch:
         try:
             await client.search_movies([movie["id"]])
@@ -211,7 +251,7 @@ async def run_radarr_cycle(
     # --- Cutoff queue ---
     cutoff = filter_monitored(cutoff)
     cursor = state["radarr"]["cutoff_cursor"]
-    batch, new_cursor = slice_batch(cutoff, cursor, settings.radarr.search_cutoff_count)
+    batch, new_cursor = slice_batch(cutoff, cursor, cutoff_limit)
     for movie in batch:
         try:
             await client.search_movies([movie["id"]])
@@ -274,11 +314,24 @@ async def run_sonarr_cycle(
     state["sonarr"]["missing_count"] = len(missing_episodes)
     state["sonarr"]["cutoff_count"] = len(cutoff_episodes)
 
+    # Apply hard max cap (SRCH-12)
+    missing_limit = settings.sonarr.search_missing_count
+    cutoff_limit = settings.sonarr.search_cutoff_count
+    hard_max = settings.general.hard_max_per_cycle
+    missing_limit, cutoff_limit = cap_batch_sizes(missing_limit, cutoff_limit, hard_max)
+    if hard_max > 0 and (missing_limit != settings.sonarr.search_missing_count or cutoff_limit != settings.sonarr.search_cutoff_count):
+        logger.debug(
+            "Sonarr: Hard max {max} applied -- missing={m}, cutoff={c}",
+            max=hard_max,
+            m=missing_limit,
+            c=cutoff_limit,
+        )
+
     # --- Missing queue ---
     missing_episodes = filter_sonarr_episodes(missing_episodes)
     missing_seasons = deduplicate_to_seasons(missing_episodes)
     cursor = state["sonarr"]["missing_cursor"]
-    batch, new_cursor = slice_batch(missing_seasons, cursor, settings.sonarr.search_missing_count)
+    batch, new_cursor = slice_batch(missing_seasons, cursor, missing_limit)
     for season in batch:
         try:
             await client.search_season(season["seriesId"], season["seasonNumber"])
@@ -296,7 +349,7 @@ async def run_sonarr_cycle(
     cutoff_episodes = filter_sonarr_episodes(cutoff_episodes)
     cutoff_seasons = deduplicate_to_seasons(cutoff_episodes)
     cursor = state["sonarr"]["cutoff_cursor"]
-    batch, new_cursor = slice_batch(cutoff_seasons, cursor, settings.sonarr.search_cutoff_count)
+    batch, new_cursor = slice_batch(cutoff_seasons, cursor, cutoff_limit)
     for season in batch:
         try:
             await client.search_season(season["seriesId"], season["seasonNumber"])

@@ -17,6 +17,7 @@ DEFAULT_CONFIG = """\
 [general]
 # Log level: debug, info, warning, error
 log_level = "info"
+# hard_max_per_cycle = 0   # 0 = unlimited; caps total items searched per app per cycle
 
 [radarr]
 # Radarr connection settings

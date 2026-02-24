@@ -7,7 +7,7 @@ import io
 from loguru import logger
 
 from fetcharr.models.config import ArrConfig, Settings
-from fetcharr.startup import check_localhost_urls
+from fetcharr.startup import check_localhost_urls, collect_secrets
 
 
 def _make_settings(
@@ -117,3 +117,28 @@ def test_disabled_app_with_localhost_no_warning() -> None:
 
     output = sink.getvalue()
     assert output == ""
+
+
+# ---------------------------------------------------------------------------
+# collect_secrets
+# ---------------------------------------------------------------------------
+
+
+def test_collect_secrets_extracts_all_api_keys() -> None:
+    """collect_secrets returns non-empty API key values from all configured apps."""
+    settings = Settings(
+        radarr=ArrConfig(
+            url="http://radarr:7878",
+            api_key="radarr-secret",
+            enabled=True,
+        ),
+        sonarr=ArrConfig(
+            url="http://sonarr:8989",
+            api_key="sonarr-secret",
+            enabled=True,
+        ),
+    )
+    result = collect_secrets(settings)
+    assert "radarr-secret" in result
+    assert "sonarr-secret" in result
+    assert len(result) == 2

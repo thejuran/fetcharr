@@ -16,6 +16,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Search Engine** - Scheduler, round-robin, and cycle logic — the core product
 - [x] **Phase 3: Web UI** - Status dashboard and config editor backed by real state data
 - [x] **Phase 4: Docker** - Multi-stage packaging and release-ready artifact
+- [ ] **Phase 5: Security Hardening** - CSRF, SSRF, input validation, Docker hardening, and CDN removal
+- [ ] **Phase 6: Bug Fixes & Resilience** - Race conditions, error handling, state recovery, and log redaction
+- [ ] **Phase 7: Test Coverage** - Async path tests for clients, cycles, scheduler, and startup
 
 ## Phase Details
 
@@ -88,11 +91,64 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-02-23 |
-| 2. Search Engine | 3/3 | Complete    | 2026-02-24 |
+| 2. Search Engine | 3/3 | Complete | 2026-02-24 |
 | 3. Web UI | 3/3 | Complete | 2026-02-24 |
-| 4. Docker | 1/1 | Complete    | 2026-02-24 |
+| 4. Docker | 1/1 | Complete | 2026-02-24 |
+| 5. Security Hardening | 0/? | Not Started | — |
+| 6. Bug Fixes & Resilience | 0/? | Not Started | — |
+| 7. Test Coverage | 0/? | Not Started | — |
+
+### Phase 5: Security Hardening
+**Goal**: All web-facing endpoints are protected against cross-origin attacks and input abuse, Docker defaults follow least-privilege, and no external CDN dependency remains
+**Depends on**: Phase 4
+**Requirements**: SECR-02, SECR-03, SECR-04, SECR-05, SECR-06, SECR-07
+**Success Criteria** (what must be TRUE):
+  1. All state-changing POST endpoints (`/settings`, `/api/search-now/{app}`) reject cross-origin requests via Origin/Referer header validation
+  2. ArrConfig URL field validates scheme (http/https only) and blocks known cloud metadata endpoints (169.254.169.254)
+  3. Integer form fields (search_interval, search_missing_count, search_cutoff_count) are clamped to safe bounds and never crash on non-integer input
+  4. log_level accepts only an explicit allowlist (debug, info, warning, error) — anything else defaults to info
+  5. docker-compose.yml binds port to 127.0.0.1 only, container drops all capabilities, and entrypoint sets no-new-privileges
+  6. Config TOML file is written with 0o600 permissions (owner read/write only)
+  7. htmx is bundled as a local static file — no external CDN or unpinned script tag
+**Plans:** 2 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Origin/Referer CSRF middleware, Docker least-privilege hardening, htmx vendoring
+- [ ] 05-02-PLAN.md — URL scheme + SSRF validation, integer clamping, log level allowlist, config file permissions
+
+### Phase 6: Bug Fixes & Resilience
+**Goal**: All critical and warning-level bugs from the code review are fixed — race conditions eliminated, error handling consistent, state recovery graceful, and log redaction comprehensive
+**Depends on**: Phase 5
+**Requirements**: QUAL-01, QUAL-02, QUAL-03, QUAL-04, QUAL-05, QUAL-06
+**Success Criteria** (what must be TRUE):
+  1. Concurrent search cycles (scheduler + manual search-now) are serialized via asyncio.Lock — no state corruption possible
+  2. Settings are validated via Pydantic model BEFORE writing to disk — invalid config never reaches the TOML file
+  3. Temp files from atomic state writes are cleaned up on `os.replace` failure; corrupt state JSON recovers to defaults instead of crashing
+  4. State file load fills missing keys from defaults (schema migration) so older state files do not crash newer code
+  5. Log redaction covers exception tracebacks, and settings hot-reload re-initializes the redaction filter with new API keys
+  6. `validate_connection` and `get_paginated` catch `ValidationError` gracefully; `RemoteProtocolError` is retried; `deduplicate_to_seasons` handles missing fields; httpx exception hierarchy is correct
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 6 to break down)
+
+### Phase 7: Test Coverage
+**Goal**: All async code paths have test coverage — the scheduler→engine→client chain, cycle functions, startup orchestration, and error/retry paths are exercised by the test suite
+**Depends on**: Phase 6
+**Requirements**: QUAL-07
+**Success Criteria** (what must be TRUE):
+  1. `_request_with_retry` has tests for first-attempt success, retry on failure, and re-raise when retry also fails
+  2. `get_paginated` has tests for single page, multi-page, empty results, and malformed API response
+  3. `validate_connection` has tests for success, 401, ConnectError, and TimeoutException branches
+  4. `run_radarr_cycle` and `run_sonarr_cycle` have tests for happy path, network failure, per-item skip-on-failure, and cursor advancement
+  5. `make_search_job` has tests for client-is-None early return and exception swallowing
+  6. `collect_secrets` has a test verifying all configured API keys are extracted for redaction
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 7 to break down)

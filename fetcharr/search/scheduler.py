@@ -21,6 +21,7 @@ from loguru import logger
 
 from fetcharr.clients.radarr import RadarrClient
 from fetcharr.clients.sonarr import SonarrClient
+from fetcharr.db import init_db, migrate_from_state
 from fetcharr.models.config import Settings
 from fetcharr.search.engine import run_radarr_cycle, run_sonarr_cycle
 from fetcharr.state import FetcharrState, load_state, save_state
@@ -56,6 +57,7 @@ def make_search_job(
                     client,
                     app.state.fetcharr_state,
                     app.state.settings,
+                    app.state.db_path,
                 )
                 save_state(app.state.fetcharr_state, state_path)
             except Exception as exc:
@@ -92,6 +94,17 @@ def create_lifespan(
         state: FetcharrState = load_state(state_path)
         scheduler = AsyncIOScheduler()
 
+        # Initialize search history database (SRCH-13)
+        db_path = state_path.parent / "fetcharr.db"
+        await init_db(db_path)
+
+        # Migrate existing search_log from state.json to SQLite (one-time)
+        if state.get("search_log"):
+            migrated = await migrate_from_state(db_path, state["search_log"])
+            if migrated > 0:
+                state["search_log"] = []
+                save_state(state, state_path)
+
         radarr_client: RadarrClient | None = None
         sonarr_client: SonarrClient | None = None
 
@@ -111,6 +124,7 @@ def create_lifespan(
         # --- Expose all shared state on app.state ---
         app.state.fetcharr_state = state
         app.state.settings = settings
+        app.state.db_path = db_path
         app.state.scheduler = scheduler
         app.state.radarr_client = radarr_client
         app.state.sonarr_client = sonarr_client

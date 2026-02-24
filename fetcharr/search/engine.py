@@ -1,13 +1,15 @@
 """Core search engine: utility functions and search cycle orchestrators.
 
-Pure functions for filtering, batching, deduplication, and search logging,
-plus async cycle functions that compose them with API client calls to
-drive the automated search behaviour for Radarr and Sonarr.
+Pure functions for filtering, batching, and deduplication, plus async
+cycle functions that compose them with API client calls to drive the
+automated search behaviour for Radarr and Sonarr.  Search history is
+persisted to SQLite via the ``fetcharr.db`` module.
 """
 
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from pathlib import Path
 
 import httpx
 import pydantic
@@ -15,10 +17,9 @@ from loguru import logger
 
 from fetcharr.clients.radarr import RadarrClient
 from fetcharr.clients.sonarr import SonarrClient
+from fetcharr.db import insert_search_entry
 from fetcharr.models.config import Settings
 from fetcharr.state import FetcharrState
-
-SEARCH_LOG_MAX = 50
 
 
 def cap_batch_sizes(missing_count: int, cutoff_count: int, hard_max: int) -> tuple[int, int]:
@@ -86,29 +87,6 @@ def slice_batch(items: list, cursor: int, batch_size: int) -> tuple[list, int]:
     if new_cursor >= len(items):
         new_cursor = 0
     return batch, new_cursor
-
-
-def append_search_log(
-    state: FetcharrState, app: str, queue_type: str, item_name: str
-) -> None:
-    """Append a search log entry to state, bounded at 50 entries.
-
-    Evicts oldest entries when the log exceeds ``SEARCH_LOG_MAX``.
-
-    Args:
-        state: Mutable state dict (modified in place).
-        app: Application name (e.g. "Radarr", "Sonarr").
-        queue_type: Queue type (e.g. "missing", "cutoff").
-        item_name: Human-readable name of the searched item.
-    """
-    entry = {
-        "name": item_name,
-        "timestamp": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
-        "app": app,
-        "queue_type": queue_type,
-    }
-    state["search_log"].append(entry)
-    state["search_log"] = state["search_log"][-SEARCH_LOG_MAX:]
 
 
 def deduplicate_to_seasons(episodes: list[dict]) -> list[dict]:
@@ -179,6 +157,7 @@ async def run_radarr_cycle(
     client: RadarrClient,
     state: FetcharrState,
     settings: Settings,
+    db_path: Path,
 ) -> FetcharrState:
     """Run one complete Radarr search cycle: missing batch then cutoff batch.
 
@@ -194,6 +173,7 @@ async def run_radarr_cycle(
         client: Connected Radarr API client.
         state: Mutable application state (modified in place).
         settings: Application settings with batch size configuration.
+        db_path: Path to the SQLite database file for search history.
 
     Returns:
         Updated state with new cursor positions and last_run timestamp.
@@ -239,7 +219,7 @@ async def run_radarr_cycle(
     for movie in batch:
         try:
             await client.search_movies([movie["id"]])
-            append_search_log(state, "Radarr", "missing", movie["title"])
+            await insert_search_entry(db_path, "Radarr", "missing", movie["title"])
             logger.info("Radarr: Searched {title} (missing)", title=movie["title"])
         except Exception as exc:
             logger.warning(
@@ -256,7 +236,7 @@ async def run_radarr_cycle(
     for movie in batch:
         try:
             await client.search_movies([movie["id"]])
-            append_search_log(state, "Radarr", "cutoff", movie["title"])
+            await insert_search_entry(db_path, "Radarr", "cutoff", movie["title"])
             logger.info("Radarr: Searched {title} (cutoff)", title=movie["title"])
         except Exception as exc:
             logger.warning(
@@ -275,6 +255,7 @@ async def run_sonarr_cycle(
     client: SonarrClient,
     state: FetcharrState,
     settings: Settings,
+    db_path: Path,
 ) -> FetcharrState:
     """Run one complete Sonarr search cycle: missing batch then cutoff batch.
 
@@ -291,6 +272,7 @@ async def run_sonarr_cycle(
         client: Connected Sonarr API client.
         state: Mutable application state (modified in place).
         settings: Application settings with batch size configuration.
+        db_path: Path to the SQLite database file for search history.
 
     Returns:
         Updated state with new cursor positions and last_run timestamp.
@@ -337,7 +319,7 @@ async def run_sonarr_cycle(
     for season in batch:
         try:
             await client.search_season(season["seriesId"], season["seasonNumber"])
-            append_search_log(state, "Sonarr", "missing", season["display_name"])
+            await insert_search_entry(db_path, "Sonarr", "missing", season["display_name"])
             logger.info("Sonarr: Searched {name} (missing)", name=season["display_name"])
         except Exception as exc:
             logger.warning(
@@ -355,7 +337,7 @@ async def run_sonarr_cycle(
     for season in batch:
         try:
             await client.search_season(season["seriesId"], season["seasonNumber"])
-            append_search_log(state, "Sonarr", "cutoff", season["display_name"])
+            await insert_search_entry(db_path, "Sonarr", "cutoff", season["display_name"])
             logger.info("Sonarr: Searched {name} (cutoff)", name=season["display_name"])
         except Exception as exc:
             logger.warning(

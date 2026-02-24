@@ -4,7 +4,7 @@
      hx-swap="outerHTML"
      class="bg-fetcharr-card rounded-lg border border-fetcharr-border p-5">
   <h2 class="text-lg font-semibold mb-4">Search Log</h2>
-  {% set entries = search_log[::-1][:20] %}
+  {% set entries = search_log[:20] %}
   {% if not entries %}
   <p class="text-fetcharr-muted text-sm">No searches yet.</p>
   {% else %}

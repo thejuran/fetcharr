@@ -19,6 +19,7 @@ from loguru import logger
 
 from fetcharr.clients.radarr import RadarrClient
 from fetcharr.clients.sonarr import SonarrClient
+from fetcharr.db import get_recent_searches
 from fetcharr.logging import setup_logging
 from fetcharr.models.config import Settings as SettingsModel
 from fetcharr.search.engine import run_radarr_cycle, run_sonarr_cycle
@@ -85,8 +86,7 @@ async def dashboard(request: Request) -> HTMLResponse:
         if ctx is not None:
             apps.append(ctx)
 
-    state = request.app.state.fetcharr_state
-    search_log = state.get("search_log", [])
+    search_log = await get_recent_searches(request.app.state.db_path)
 
     return templates.TemplateResponse(
         request=request,
@@ -255,6 +255,7 @@ async def search_now(request: Request, app_name: str) -> HTMLResponse:
                 client,
                 request.app.state.fetcharr_state,
                 request.app.state.settings,
+                request.app.state.db_path,
             )
             save_state(
                 request.app.state.fetcharr_state,
@@ -294,8 +295,7 @@ async def partial_app_card(request: Request, app_name: str) -> HTMLResponse:
 @router.get("/partials/search-log", response_class=HTMLResponse)
 async def partial_search_log(request: Request) -> HTMLResponse:
     """Return an HTML fragment for the search log (htmx partial)."""
-    state = request.app.state.fetcharr_state
-    search_log = state.get("search_log", [])
+    search_log = await get_recent_searches(request.app.state.db_path)
 
     return templates.TemplateResponse(
         request=request,

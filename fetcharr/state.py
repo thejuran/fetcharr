@@ -36,7 +36,7 @@ class FetcharrState(TypedDict, total=False):
 
     radarr: AppState
     sonarr: AppState
-    search_log: list[dict]  # bounded log of recent searches
+    search_log: list[dict]  # deprecated: migrated to SQLite (SRCH-13), kept for migration compat
 
 
 def _default_state() -> FetcharrState:

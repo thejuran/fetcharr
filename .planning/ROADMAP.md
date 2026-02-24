@@ -28,12 +28,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Fetcharr can fetch the full paginated wanted (missing) and cutoff-unmet item lists from both Radarr and Sonarr
   3. No HTTP endpoint — including any config or status endpoint — returns an API key value in its response body or headers
   4. All *arr API calls use X-Api-Key header auth; no API key ever appears in a URL or log line
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 01-01: Project scaffolding, config layer (TOML), and Pydantic settings model
-- [ ] 01-02: State store scaffolding (JSON file with atomic write) and startup validation
-- [ ] 01-03: Radarr and Sonarr httpx AsyncClient wrappers with paginated list fetching
+- [ ] 01-01-PLAN.md — Project scaffolding, config models (Pydantic + TOML), logging with redaction, and atomic JSON state store
+- [ ] 01-02-PLAN.md — httpx API clients (base + Radarr + Sonarr) with paginated list fetching and retry logic
+- [ ] 01-03-PLAN.md — Startup orchestration (entry point, validation, banner) and test suite
 
 ### Phase 2: Search Engine
 **Goal**: Fetcharr automatically cycles through wanted and cutoff-unmet items for both apps on a configurable schedule, with round-robin position persisted across restarts and Sonarr searching at season level

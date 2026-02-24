@@ -16,9 +16,9 @@ Requirements for Ship & Document release. Each maps to roadmap phases.
 
 ### CI/CD
 
-- [ ] **CICD-01**: GitHub Actions runs pytest on every PR and push to main
-- [ ] **CICD-02**: GitHub Actions runs linting (ruff) on every PR and push to main
-- [ ] **CICD-03**: GitHub Actions validates Docker build on every PR
+- [x] **CICD-01**: GitHub Actions runs pytest on every PR and push to main
+- [x] **CICD-02**: GitHub Actions runs linting (ruff) on every PR and push to main
+- [x] **CICD-03**: GitHub Actions validates Docker build on every PR
 
 ### Release Pipeline
 
@@ -63,9 +63,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DOCS-02 | Phase 12 | Pending |
 | DOCS-03 | Phase 12 | Pending |
 | DOCS-04 | Phase 12 | Pending |
-| CICD-01 | Phase 9 | Pending |
-| CICD-02 | Phase 9 | Pending |
-| CICD-03 | Phase 9 | Pending |
+| CICD-01 | Phase 9 | Complete |
+| CICD-02 | Phase 9 | Complete |
+| CICD-03 | Phase 9 | Complete |
 | RELS-01 | Phase 10 | Pending |
 | RELS-02 | Phase 10 | Pending |
 | RELS-03 | Phase 10 | Pending |

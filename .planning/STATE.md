@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 9 of 12 (CI/CD Pipeline)
-Plan: —
-Status: Ready to plan
-Last activity: 2026-02-24 — Roadmap created for v1.1
+Plan: 1 of 1 complete
+Status: Phase 9 complete
+Last activity: 2026-02-24 — CI/CD pipeline configured
 
-Progress: [██████████████████░░░░░░░░░░░░] 18/18 plans (v1.0) + 0/? (v1.1)
+Progress: [███████████████████░░░░░░░░░░░] 18/18 plans (v1.0) + 1/? (v1.1)
 
 ## Performance Metrics
 
@@ -23,11 +23,20 @@ Progress: [██████████████████░░░░░
 - Average duration: 2min
 - Total execution time: 40min
 
+**v1.1 Metrics:**
+
+| Phase | Plan | Duration | Tasks | Files |
+|-------|------|----------|-------|-------|
+| 09-ci-cd-pipeline | 01 | 2min | 2 | 14 |
+
 ## Accumulated Context
 
 ### Decisions
 
 Full decision log in PROJECT.md Key Decisions table.
+
+- [09-01] Selected ruff rule sets E, F, I, UP, B, SIM for comprehensive but non-noisy linting
+- [09-01] Three parallel CI jobs (test, lint, docker) with no inter-job dependencies for fastest feedback
 
 ### Pending Todos
 
@@ -41,5 +50,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Roadmap created for v1.1 milestone
+Stopped at: Completed 09-01-PLAN.md (CI/CD Pipeline)
 Resume file: None

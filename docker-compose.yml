@@ -1,0 +1,19 @@
+# Fetcharr Docker Compose
+# To build locally instead of pulling the image, replace the `image:` line
+# with `build: .` and run `docker compose up --build`.
+
+services:
+  fetcharr:
+    image: ghcr.io/thejuran/fetcharr:latest
+    container_name: fetcharr
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - fetcharr_config:/config
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  fetcharr_config:

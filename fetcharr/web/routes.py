@@ -19,7 +19,7 @@ from loguru import logger
 
 from fetcharr.clients.radarr import RadarrClient
 from fetcharr.clients.sonarr import SonarrClient
-from fetcharr.db import get_recent_searches
+from fetcharr.db import get_recent_searches, get_search_history
 from fetcharr.log_buffer import log_buffer
 from fetcharr.logging import setup_logging
 from fetcharr.models.config import Settings as SettingsModel
@@ -119,6 +119,70 @@ async def settings_page(request: Request) -> HTMLResponse:
             "apps": apps,
             "log_level": settings.general.log_level,
             "hard_max_per_cycle": settings.general.hard_max_per_cycle,
+        },
+    )
+
+
+@router.get("/history", response_class=HTMLResponse)
+async def history_page(request: Request) -> HTMLResponse:
+    """Render the search history page with full filtering and pagination."""
+    result = await get_search_history(request.app.state.db_path)
+    return templates.TemplateResponse(
+        request=request,
+        name="history.html",
+        context={
+            "result": result,
+            "active_apps": [],
+            "active_queues": [],
+            "active_outcomes": [],
+            "search_text": "",
+        },
+    )
+
+
+def _split_filter_param(value: str | None) -> list[str] | None:
+    """Split a comma-separated query param into a list, or None if empty.
+
+    Args:
+        value: Raw query param string (e.g. "Radarr,Sonarr").
+
+    Returns:
+        List of non-empty strings, or None if value is absent/empty.
+    """
+    if not value:
+        return None
+    parts = [p.strip() for p in value.split(",") if p.strip()]
+    return parts or None
+
+
+@router.get("/partials/history-results", response_class=HTMLResponse)
+async def partial_history_results(request: Request) -> HTMLResponse:
+    """Return the history results partial with filter and pagination support."""
+    params = request.query_params
+    page = int(params.get("page", "1"))
+    app_filter = _split_filter_param(params.get("app"))
+    queue_filter = _split_filter_param(params.get("queue"))
+    outcome_filter = _split_filter_param(params.get("outcome"))
+    search_text = params.get("search", "")
+
+    result = await get_search_history(
+        request.app.state.db_path,
+        page=page,
+        app_filter=app_filter,
+        queue_filter=queue_filter,
+        outcome_filter=outcome_filter,
+        search_text=search_text,
+    )
+
+    return templates.TemplateResponse(
+        request=request,
+        name="partials/history_results.html",
+        context={
+            "result": result,
+            "active_apps": app_filter or [],
+            "active_queues": queue_filter or [],
+            "active_outcomes": outcome_filter or [],
+            "search_text": search_text,
         },
     )
 

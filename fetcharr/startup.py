@@ -160,7 +160,15 @@ async def startup(config_path: Path | None = None) -> Settings:
     # 4. Print banner
     print_banner(settings)
 
-    # 4.5 Warn about localhost URLs (common Docker networking mistake)
+    # 4.5 Warn if no apps configured (first-run scenario)
+    if not settings.has_enabled_app:
+        logger.warning(
+            "No apps configured -- visit http://localhost:8080/settings to "
+            "add your Radarr/Sonarr connection"
+        )
+        return settings
+
+    # 4.6 Warn about localhost URLs (common Docker networking mistake)
     check_localhost_urls(settings)
 
     # 5. Validate connections

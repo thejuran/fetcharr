@@ -66,13 +66,16 @@ def test_settings_loads_from_toml(tmp_path: Path) -> None:
     assert settings.sonarr.enabled is True
 
 
-def test_settings_rejects_no_enabled_apps(tmp_path: Path) -> None:
-    """Config with no enabled apps raises ValidationError."""
+def test_settings_allows_no_enabled_apps(tmp_path: Path) -> None:
+    """Config with no enabled apps loads successfully (first-run scenario)."""
     config_file = tmp_path / "fetcharr.toml"
     config_file.write_text(NO_APPS_TOML)
 
-    with pytest.raises(Exception, match="At least one app"):
-        load_settings(config_file)
+    settings = load_settings(config_file)
+
+    assert settings.radarr.enabled is False
+    assert settings.sonarr.enabled is False
+    assert settings.has_enabled_app is False
 
 
 def test_settings_allows_single_app(tmp_path: Path) -> None:

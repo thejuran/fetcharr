@@ -1,6 +1,14 @@
-"""Tests for client structure, header auth, timeout, and subclass hierarchy."""
+"""Tests for client structure, header auth, timeout, subclass hierarchy, and async base methods."""
 
 from __future__ import annotations
+
+import asyncio
+import json
+from unittest.mock import AsyncMock, patch
+
+import httpx
+import pydantic
+import pytest
 
 from fetcharr.clients.base import ArrClient
 from fetcharr.clients.radarr import RadarrClient
@@ -55,3 +63,244 @@ def test_api_key_not_in_url() -> None:
     client = ArrClient(base_url="http://localhost:7878", api_key=api_key)
     assert api_key not in str(client._client.base_url)
     assert client._client.headers["X-Api-Key"] == api_key
+
+
+# ---------------------------------------------------------------------------
+# Async tests: _request_with_retry
+# ---------------------------------------------------------------------------
+
+
+async def test_request_with_retry_first_attempt_success() -> None:
+    """_request_with_retry returns response on first-attempt success without retry."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"ok": True})
+
+    transport = httpx.MockTransport(handler)
+    client = ArrClient(base_url="http://test", api_key="key")
+    client._app_name = "Test"
+    client._client = httpx.AsyncClient(transport=transport, base_url="http://test")
+    try:
+        response = await client._request_with_retry("GET", "/test")
+        assert response.status_code == 200
+    finally:
+        await client.close()
+
+
+async def test_request_with_retry_retries_on_failure() -> None:
+    """_request_with_retry retries once on first failure, returns success response on second attempt."""
+    call_count = 0
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal call_count
+        call_count += 1
+        if call_count == 1:
+            return httpx.Response(500, request=request)
+        return httpx.Response(200, json={"ok": True})
+
+    transport = httpx.MockTransport(handler)
+    client = ArrClient(base_url="http://test", api_key="key")
+    client._app_name = "Test"
+    client._client = httpx.AsyncClient(transport=transport, base_url="http://test")
+    try:
+        with patch("asyncio.sleep", new_callable=AsyncMock):
+            response = await client._request_with_retry("GET", "/test")
+        assert call_count == 2
+        assert response.status_code == 200
+    finally:
+        await client.close()
+
+
+async def test_request_with_retry_reraises_when_retry_fails() -> None:
+    """_request_with_retry re-raises exception when retry also fails."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(500, request=request)
+
+    transport = httpx.MockTransport(handler)
+    client = ArrClient(base_url="http://test", api_key="key")
+    client._app_name = "Test"
+    client._client = httpx.AsyncClient(transport=transport, base_url="http://test")
+    try:
+        with patch("asyncio.sleep", new_callable=AsyncMock):
+            with pytest.raises(httpx.HTTPStatusError):
+                await client._request_with_retry("GET", "/test")
+    finally:
+        await client.close()
+
+
+# ---------------------------------------------------------------------------
+# Async tests: get_paginated
+# ---------------------------------------------------------------------------
+
+
+async def test_get_paginated_single_page() -> None:
+    """get_paginated returns records from a single page."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = {
+            "page": 1,
+            "pageSize": 50,
+            "sortKey": "id",
+            "totalRecords": 2,
+            "records": [{"id": 1}, {"id": 2}],
+        }
+        return httpx.Response(200, json=body)
+
+    transport = httpx.MockTransport(handler)
+    client = ArrClient(base_url="http://test", api_key="key")
+    client._app_name = "Test"
+    client._client = httpx.AsyncClient(transport=transport, base_url="http://test")
+    try:
+        result = await client.get_paginated("/items")
+        assert len(result) == 2
+    finally:
+        await client.close()
+
+
+async def test_get_paginated_multi_page() -> None:
+    """get_paginated returns all records across multiple pages."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        page = request.url.params.get("page", "1")
+        if page == "1":
+            body = {
+                "page": 1,
+                "pageSize": 2,
+                "sortKey": "id",
+                "totalRecords": 3,
+                "records": [{"id": 1}, {"id": 2}],
+            }
+        else:
+            body = {
+                "page": 2,
+                "pageSize": 2,
+                "sortKey": "id",
+                "totalRecords": 3,
+                "records": [{"id": 3}],
+            }
+        return httpx.Response(200, json=body)
+
+    transport = httpx.MockTransport(handler)
+    client = ArrClient(base_url="http://test", api_key="key")
+    client._app_name = "Test"
+    client._client = httpx.AsyncClient(transport=transport, base_url="http://test")
+    try:
+        result = await client.get_paginated("/items", page_size=2)
+        assert len(result) == 3
+    finally:
+        await client.close()
+
+
+async def test_get_paginated_empty_results() -> None:
+    """get_paginated returns empty list for zero totalRecords."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = {
+            "page": 1,
+            "pageSize": 50,
+            "sortKey": "id",
+            "totalRecords": 0,
+            "records": [],
+        }
+        return httpx.Response(200, json=body)
+
+    transport = httpx.MockTransport(handler)
+    client = ArrClient(base_url="http://test", api_key="key")
+    client._app_name = "Test"
+    client._client = httpx.AsyncClient(transport=transport, base_url="http://test")
+    try:
+        result = await client.get_paginated("/items")
+        assert result == []
+    finally:
+        await client.close()
+
+
+async def test_get_paginated_malformed_response() -> None:
+    """get_paginated raises ValidationError on malformed API response."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"bad": "data"})
+
+    transport = httpx.MockTransport(handler)
+    client = ArrClient(base_url="http://test", api_key="key")
+    client._app_name = "Test"
+    client._client = httpx.AsyncClient(transport=transport, base_url="http://test")
+    try:
+        with pytest.raises(pydantic.ValidationError):
+            await client.get_paginated("/items")
+    finally:
+        await client.close()
+
+
+# ---------------------------------------------------------------------------
+# Async tests: validate_connection
+# ---------------------------------------------------------------------------
+
+
+async def test_validate_connection_success() -> None:
+    """validate_connection returns True on 200 with valid system status."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"version": "5.0.0"})
+
+    transport = httpx.MockTransport(handler)
+    client = ArrClient(base_url="http://test", api_key="key")
+    client._app_name = "Test"
+    client._client = httpx.AsyncClient(transport=transport, base_url="http://test")
+    try:
+        result = await client.validate_connection()
+        assert result is True
+    finally:
+        await client.close()
+
+
+async def test_validate_connection_401() -> None:
+    """validate_connection returns False on 401 Unauthorized."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(401, request=request)
+
+    transport = httpx.MockTransport(handler)
+    client = ArrClient(base_url="http://test", api_key="key")
+    client._app_name = "Test"
+    client._client = httpx.AsyncClient(transport=transport, base_url="http://test")
+    try:
+        result = await client.validate_connection()
+        assert result is False
+    finally:
+        await client.close()
+
+
+async def test_validate_connection_connect_error() -> None:
+    """validate_connection returns False on ConnectError."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectError("refused")
+
+    transport = httpx.MockTransport(handler)
+    client = ArrClient(base_url="http://test", api_key="key")
+    client._app_name = "Test"
+    client._client = httpx.AsyncClient(transport=transport, base_url="http://test")
+    try:
+        result = await client.validate_connection()
+        assert result is False
+    finally:
+        await client.close()
+
+
+async def test_validate_connection_timeout() -> None:
+    """validate_connection returns False on TimeoutException."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        raise httpx.TimeoutException("timed out")
+
+    transport = httpx.MockTransport(handler)
+    client = ArrClient(base_url="http://test", api_key="key")
+    client._app_name = "Test"
+    client._client = httpx.AsyncClient(transport=transport, base_url="http://test")
+    try:
+        result = await client.validate_connection()
+        assert result is False
+    finally:
+        await client.close()

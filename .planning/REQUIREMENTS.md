@@ -129,17 +129,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WEBU-08 | Phase 3 | Complete |
 | DEPL-01 | Phase 4 | Complete |
 | SECR-02 | Phase 5 | Complete |
-| SECR-03 | Phase 5 | Planned |
-| SECR-04 | Phase 5 | Planned |
+| SECR-03 | Phase 5 | Complete |
+| SECR-04 | Phase 5 | Complete |
 | SECR-05 | Phase 5 | Complete |
-| SECR-06 | Phase 5 | Planned |
+| SECR-06 | Phase 5 | Complete |
 | SECR-07 | Phase 5 | Complete |
-| QUAL-01 | Phase 6 | Planned |
-| QUAL-02 | Phase 6 | Planned |
-| QUAL-03 | Phase 6 | Planned |
-| QUAL-04 | Phase 6 | Planned |
-| QUAL-05 | Phase 6 | Planned |
-| QUAL-06 | Phase 6 | Planned |
+| QUAL-01 | Phase 6 | Complete |
+| QUAL-02 | Phase 6 | Complete |
+| QUAL-03 | Phase 6 | Complete |
+| QUAL-04 | Phase 6 | Complete |
+| QUAL-05 | Phase 6 | Complete |
+| QUAL-06 | Phase 6 | Complete |
 | QUAL-07 | Phase 7 | Complete |
 
 **Coverage:**

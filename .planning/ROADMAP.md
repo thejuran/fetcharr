@@ -18,7 +18,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Docker** - Multi-stage packaging and release-ready artifact
 - [x] **Phase 5: Security Hardening** - CSRF, SSRF, input validation, Docker hardening, and CDN removal (completed 2026-02-24)
 - [x] **Phase 6: Bug Fixes & Resilience** - Race conditions, error handling, state recovery, and log redaction (completed 2026-02-24)
-- [ ] **Phase 7: Test Coverage** - Async path tests for clients, cycles, scheduler, and startup
+- [x] **Phase 7: Test Coverage** - Async path tests for clients, cycles, scheduler, and startup (completed 2026-02-24)
+- [ ] **Phase 8: Tech Debt Cleanup** - Dead code removal, missing test, stale docs (gap closure from audit)
 
 ## Phase Details
 
@@ -99,9 +100,10 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Search Engine | 3/3 | Complete | 2026-02-24 |
 | 3. Web UI | 3/3 | Complete | 2026-02-24 |
 | 4. Docker | 1/1 | Complete | 2026-02-24 |
-| 5. Security Hardening | 1/2 | Complete    | 2026-02-24 |
-| 6. Bug Fixes & Resilience | 0/3 | Complete    | 2026-02-24 |
-| 7. Test Coverage | 0/? | Not Started | — |
+| 5. Security Hardening | 2/2 | Complete | 2026-02-24 |
+| 6. Bug Fixes & Resilience | 3/3 | Complete | 2026-02-24 |
+| 7. Test Coverage | 2/2 | Complete | 2026-02-24 |
+| 8. Tech Debt Cleanup | 0/? | Not Started | — |
 
 ### Phase 5: Security Hardening
 **Goal**: All web-facing endpoints are protected against cross-origin attacks and input abuse, Docker defaults follow least-privilege, and no external CDN dependency remains
@@ -119,7 +121,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 Plans:
 - [x] 05-01-PLAN.md — Origin/Referer CSRF middleware, Docker least-privilege hardening, htmx vendoring
-- [ ] 05-02-PLAN.md — URL scheme + SSRF validation, integer clamping, log level allowlist, config file permissions
+- [x] 05-02-PLAN.md — URL scheme + SSRF validation, integer clamping, log level allowlist, config file permissions
 
 ### Phase 6: Bug Fixes & Resilience
 **Goal**: All critical and warning-level bugs from the code review are fixed — race conditions eliminated, error handling consistent, state recovery graceful, and log redaction comprehensive
@@ -135,9 +137,9 @@ Plans:
 **Plans:** 3/3 plans complete
 
 Plans:
-- [ ] 06-01-PLAN.md — State resilience: corrupt recovery, schema migration, temp file cleanup
-- [ ] 06-02-PLAN.md — Error handling: httpx retry broadening, ValidationError catches, missing field safety
-- [ ] 06-03-PLAN.md — Concurrency lock, validate-before-write, traceback redaction via custom sink
+- [x] 06-01-PLAN.md — State resilience: corrupt recovery, schema migration, temp file cleanup
+- [x] 06-02-PLAN.md — Error handling: httpx retry broadening, ValidationError catches, missing field safety
+- [x] 06-03-PLAN.md — Concurrency lock, validate-before-write, traceback redaction via custom sink
 
 ### Phase 7: Test Coverage
 **Goal**: All async code paths have test coverage — the scheduler→engine→client chain, cycle functions, startup orchestration, and error/retry paths are exercised by the test suite
@@ -153,5 +155,17 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Shared test fixtures (conftest.py) and ArrClient base method tests (MockTransport)
-- [ ] 07-02-PLAN.md — Search cycle, scheduler job, and collect_secrets async tests (AsyncMock)
+- [x] 07-01-PLAN.md — Shared test fixtures (conftest.py) and ArrClient base method tests (MockTransport)
+- [x] 07-02-PLAN.md — Search cycle, scheduler job, and collect_secrets async tests (AsyncMock)
+
+### Phase 8: Tech Debt Cleanup
+**Goal**: Eliminate dead code, close the one missing test gap, and bring all planning docs up to date — leaving v1.0 audit-clean
+**Depends on**: Phase 7
+**Requirements**: None (tech debt, not functional requirements)
+**Gap Closure**: Closes all 7 tech debt items from v1.0 audit
+**Success Criteria** (what must be TRUE):
+  1. `load_settings` import removed from `routes.py` and dead `@patch` removed from 3 test cases
+  2. `settings.html` form action uses `url_for("save_settings")` instead of hardcoded `/settings`
+  3. `POST /api/search-now/{app}` has a happy-path test with `search_lock` in the fixture
+  4. All 17 SUMMARY.md files include `requirements-completed` frontmatter field
+**Plans:** TBD

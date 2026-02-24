@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 15 (third of 4 in v1.2)
-Plan: 1 of 2 in Phase 15 complete
-Status: Executing Phase 15
-Last activity: 2026-02-24 -- Completed 15-01 (Search History Backend & UI)
+Plan: 2 of 2 in Phase 15 complete
+Status: Phase 15 complete
+Last activity: 2026-02-24 -- Completed 15-02 (Search History Tests)
 
-Progress: [██████░░░░] 60%
+Progress: [███████░░░] 70%
 
 ## Performance Metrics
 
 **Overall:**
-- Total plans completed: 27 (v1.0: 18, v1.1: 5, v1.2: 4)
+- Total plans completed: 28 (v1.0: 18, v1.1: 5, v1.2: 5)
 - Milestones shipped: 2 (v1.0, v1.1)
-- v1.2 plans completed: 5
+- v1.2 plans completed: 6
 
 **By Phase:**
 
@@ -29,7 +29,7 @@ Progress: [██████░░░░] 60%
 |-------|-------|-------|----------|
 | 13-ci-search-diagnostics | 2 | 6min | 3min |
 | 14-dashboard-observability | 2 | 6min | 3min |
-| 15-search-history-ui | 1 | 2min | 2min |
+| 15-search-history-ui | 2 | 3min | 1.5min |
 
 *Updated after each plan completion*
 
@@ -51,6 +51,8 @@ Full decision log in PROJECT.md Key Decisions table.
 - [15-01] COALESCE(outcome, 'searched') in SQL filter handles pre-migration NULL outcome rows
 - [15-01] Filter pills toggle via URL query param manipulation computed in Jinja2
 - [15-01] Text search uses 300ms debounce with hx-vals to carry current filter state
+- [15-02] Async tests use manual TestClient creation (with-block) when pre-inserting data before HTTP request
+- [15-02] Nav link active class verified by extracting full <a> tag from rendered HTML
 
 ### Pending Todos
 
@@ -64,5 +66,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 15-01-PLAN.md (Search History Backend & UI)
+Stopped at: Completed 15-02-PLAN.md (Search History Tests)
 Resume file: None

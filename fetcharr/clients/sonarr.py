@@ -5,6 +5,8 @@ from __future__ import annotations
 from typing import Any
 
 import httpx
+import pydantic
+from loguru import logger
 
 from fetcharr.clients.base import ArrClient
 
@@ -21,6 +23,31 @@ class SonarrClient(ArrClient):
     def __init__(self, base_url: str, api_key: str, timeout: float = 30.0) -> None:
         super().__init__(base_url, api_key, timeout)
         self._app_name = "Sonarr"
+
+    async def detect_api_version(self) -> str:
+        """Detect whether the Sonarr instance is running v3 or v4.
+
+        Calls ``/api/v3/system/status`` and inspects the ``version``
+        field.  This is purely informational -- no behaviour changes
+        based on the result.
+
+        Returns:
+            ``"v4"`` if the major version is 4+, otherwise ``"v3"``.
+        """
+        try:
+            response = await self._client.get("/api/v3/system/status")
+            response.raise_for_status()
+            data = response.json()
+            version = data["version"]
+            if version.startswith("4"):
+                return "v4"
+            return "v3"
+        except (httpx.HTTPError, pydantic.ValidationError, KeyError, Exception) as exc:
+            logger.warning(
+                "Sonarr: API version detection failed -- assuming v3: {exc}",
+                exc=exc,
+            )
+            return "v3"
 
     async def get_wanted_missing(self) -> list[dict[str, Any]]:
         """Fetch all wanted/missing episodes from Sonarr.

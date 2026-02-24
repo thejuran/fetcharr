@@ -122,6 +122,13 @@ async def validate_connections(settings: Settings) -> dict[str, bool]:
         )
         try:
             results["sonarr"] = await client.validate_connection()
+            if results["sonarr"]:
+                try:
+                    api_version = await client.detect_api_version()
+                    logger.info("Sonarr: Detected API {version}", version=api_version)
+                except Exception:
+                    logger.warning("Sonarr: API version detection failed -- assuming v3")
+                    logger.info("Sonarr: Detected API {version}", version="v3")
         finally:
             await client.close()
 

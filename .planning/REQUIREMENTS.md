@@ -56,8 +56,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **QUAL-01**: Concurrent search cycles serialized via asyncio.Lock — no state race condition
 - [ ] **QUAL-02**: Settings validated before writing to disk — invalid config never corrupts TOML file
-- [ ] **QUAL-03**: Atomic state writes clean up temp files on failure; corrupt state recovers to defaults
-- [ ] **QUAL-04**: State file load fills missing keys from defaults for forward-compatible schema migration
+- [x] **QUAL-03**: Atomic state writes clean up temp files on failure; corrupt state recovers to defaults
+- [x] **QUAL-04**: State file load fills missing keys from defaults for forward-compatible schema migration
 - [ ] **QUAL-05**: Log redaction covers exception tracebacks; settings hot-reload refreshes redaction filter
 - [x] **QUAL-06**: All API response parsing handles ValidationError gracefully; httpx retry covers RemoteProtocolError
 - [ ] **QUAL-07**: All async code paths (clients, cycles, scheduler, startup) have test coverage

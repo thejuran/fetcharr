@@ -324,3 +324,85 @@ def test_log_viewer_partial_shows_entries(client):
     assert "Watch out" in response.text
     assert "text-red-400" in response.text, "ERROR should use red color"
     assert "text-yellow-400" in response.text, "WARNING should use yellow color"
+
+
+# ---------------------------------------------------------------------------
+# SRCH-14: Search history page and partial tests
+# ---------------------------------------------------------------------------
+
+
+def test_history_page_returns_200(client):
+    """GET /history returns 200 and contains Search History heading."""
+    response = client.get("/history")
+    assert response.status_code == 200
+    assert "Search History" in response.text
+
+
+def test_history_page_has_nav_link(client):
+    """GET /history nav contains active History link with text-white class."""
+    response = client.get("/history")
+    assert response.status_code == 200
+    assert 'href="/history"' in response.text
+    # The history page sets nav_history_class to text-white (active)
+    # Find the <a> tag containing href="/history" and check its class
+    text = response.text
+    history_link_start = text.index('href="/history"')
+    a_start = text.rfind("<a", 0, history_link_start)
+    # Get the full <a> tag (up to closing >)
+    a_end = text.index(">", history_link_start)
+    a_tag = text[a_start:a_end + 1]
+    assert "text-white" in a_tag, "History nav link should have active text-white class"
+
+
+def test_history_page_shows_entries(client):
+    """GET /history shows entries from fixture (Test Movie)."""
+    response = client.get("/history")
+    assert response.status_code == 200
+    assert "Test Movie" in response.text
+
+
+def test_history_results_partial_returns_200(client):
+    """GET /partials/history-results returns 200 with swap target id."""
+    response = client.get("/partials/history-results")
+    assert response.status_code == 200
+    assert 'id="history-results"' in response.text
+
+
+def test_history_results_partial_with_app_filter(client):
+    """GET /partials/history-results?app=Radarr returns 200 with Radarr entry."""
+    response = client.get("/partials/history-results?app=Radarr")
+    assert response.status_code == 200
+    assert "Radarr" in response.text
+
+
+async def test_history_results_partial_pagination(test_app):
+    """GET /partials/history-results?page=2 shows pagination markup after inserting 60+ entries."""
+    db_path = test_app.state.db_path
+    for i in range(60):
+        await insert_search_entry(db_path, "Radarr", "missing", f"Bulk Movie {i}")
+
+    with TestClient(test_app) as tc:
+        response = tc.get("/partials/history-results?page=2")
+    assert response.status_code == 200
+    # Pagination controls should be present (Previous / Next links or page numbers)
+    assert "Previous" in response.text
+
+
+async def test_history_page_empty_state(test_app, tmp_path):
+    """GET /history with empty DB shows 'No search history yet' message."""
+    # Create a fresh empty DB at a different tmp_path
+    empty_db = tmp_path / "empty.db"
+    await init_db(empty_db)
+    test_app.state.db_path = empty_db
+
+    with TestClient(test_app) as tc:
+        response = tc.get("/history")
+    assert response.status_code == 200
+    assert "No search history yet" in response.text
+
+
+def test_dashboard_nav_has_history_link(client):
+    """GET / dashboard nav bar contains History link."""
+    response = client.get("/")
+    assert response.status_code == 200
+    assert 'href="/history"' in response.text

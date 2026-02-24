@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Reliably trigger searches in Radarr and Sonarr for missing and upgrade-eligible media on a schedule, without exposing credentials or expanding attack surface.
-**Current focus:** Milestone v1.1 — Ship & Document (Phase 9: CI/CD Pipeline)
+**Current focus:** Milestone v1.1 — Ship & Document (Phase 10: Release Pipeline)
 
 ## Current Position
 
-Phase: 9 of 12 (CI/CD Pipeline)
+Phase: 10 of 12 (Release Pipeline)
 Plan: 1 of 1 complete
-Status: Phase 9 complete
-Last activity: 2026-02-24 — CI/CD pipeline configured
+Status: Phase 10 complete
+Last activity: 2026-02-24 — Release pipeline and CLAUDE.md created
 
-Progress: [███████████████████░░░░░░░░░░░] 18/18 plans (v1.0) + 1/? (v1.1)
+Progress: [███████████████████░░░░░░░░░░░] 18/18 plans (v1.0) + 2/? (v1.1)
 
 ## Performance Metrics
 
@@ -28,6 +28,7 @@ Progress: [███████████████████░░░░
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 09-ci-cd-pipeline | 01 | 2min | 2 | 14 |
+| 10-release-pipeline | 01 | 2min | 2 | 2 |
 
 ## Accumulated Context
 
@@ -37,6 +38,9 @@ Full decision log in PROJECT.md Key Decisions table.
 
 - [09-01] Selected ruff rule sets E, F, I, UP, B, SIM for comprehensive but non-noisy linting
 - [09-01] Three parallel CI jobs (test, lint, docker) with no inter-job dependencies for fastest feedback
+- [10-01] Used docker/metadata-action for tag computation rather than manual shell scripting
+- [10-01] Enabled BuildKit GHA cache (cache-from/cache-to) for faster rebuilds
+- [10-01] CLAUDE.md kept to 36 lines as concise working reference
 
 ### Pending Todos
 
@@ -50,5 +54,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 09-01-PLAN.md (CI/CD Pipeline)
+Stopped at: Completed 10-01-PLAN.md (Release Pipeline)
 Resume file: None

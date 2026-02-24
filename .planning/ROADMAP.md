@@ -28,7 +28,7 @@ Fetcharr is a single-process automation daemon that cycles through Radarr and So
 ### v1.1 Ship & Document
 
 - [x] **Phase 9: CI/CD Pipeline** - GitHub Actions for testing, linting, and Docker build validation (completed 2026-02-24)
-- [ ] **Phase 10: Release Pipeline** - Automated Docker image publishing and code review convention
+- [x] **Phase 10: Release Pipeline** - Automated Docker image publishing and code review convention (completed 2026-02-24)
 - [ ] **Phase 11: Search Enhancements** - Hard max limit and persistent search history
 - [ ] **Phase 12: Documentation** - README with install guide, config reference, security model, and screenshots
 
@@ -54,7 +54,7 @@ Plans:
   1. Pushing to main builds and pushes ghcr.io/thejuran/fetcharr:dev automatically
   2. Pushing a version tag (e.g., v1.1.0) builds and pushes both :latest and the version-tagged image to ghcr.io
   3. CLAUDE.md contains the deep code review convention so Claude offers /deep-review before push
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [ ] 10-01-PLAN.md — GHCR release workflow + CLAUDE.md deep review convention
 
@@ -93,6 +93,6 @@ Plans:
 | 7. Test Coverage | v1.0 | 2/2 | Complete | 2026-02-24 |
 | 8. Tech Debt Cleanup | v1.0 | 1/1 | Complete | 2026-02-24 |
 | 9. CI/CD Pipeline | v1.1 | Complete    | 2026-02-24 | - |
-| 10. Release Pipeline | v1.1 | 0/1 | Not started | - |
+| 10. Release Pipeline | 1/1 | Complete   | 2026-02-24 | - |
 | 11. Search Enhancements | v1.1 | 0/? | Not started | - |
 | 12. Documentation | v1.1 | 0/? | Not started | - |

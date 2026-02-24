@@ -22,9 +22,9 @@ Requirements for Ship & Document release. Each maps to roadmap phases.
 
 ### Release Pipeline
 
-- [ ] **RELS-01**: Push to main builds and pushes ghcr.io/thejuran/fetcharr:dev
-- [ ] **RELS-02**: Git tag push builds and pushes ghcr.io/thejuran/fetcharr:latest + version tag
-- [ ] **RELS-03**: CLAUDE.md documents deep code review convention (offer /deep-review before push)
+- [x] **RELS-01**: Push to main builds and pushes ghcr.io/thejuran/fetcharr:dev
+- [x] **RELS-02**: Git tag push builds and pushes ghcr.io/thejuran/fetcharr:latest + version tag
+- [x] **RELS-03**: CLAUDE.md documents deep code review convention (offer /deep-review before push)
 
 ### Search Features
 
@@ -66,9 +66,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CICD-01 | Phase 9 | Complete |
 | CICD-02 | Phase 9 | Complete |
 | CICD-03 | Phase 9 | Complete |
-| RELS-01 | Phase 10 | Pending |
-| RELS-02 | Phase 10 | Pending |
-| RELS-03 | Phase 10 | Pending |
+| RELS-01 | Phase 10 | Complete |
+| RELS-02 | Phase 10 | Complete |
+| RELS-03 | Phase 10 | Complete |
 | SRCH-12 | Phase 11 | Pending |
 | SRCH-13 | Phase 11 | Pending |
 

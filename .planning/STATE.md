@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 Phase: None (between milestones)
 Plan: N/A
 Status: v1.2 milestone complete, ready for next milestone
-Last activity: 2026-02-24 -- Completed v1.2 milestone archival
+Last activity: 2026-02-25 - Completed quick task 1: Allow 0 for missing/cutoff counts but require at least 1 in one of the two
 
 Progress: [██████████] 100%
 
@@ -49,6 +49,12 @@ None.
 ### Blockers/Concerns
 
 8 medium-severity tech debt items deferred from v1.2 deep code review (see MILESTONES.md).
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 1 | Allow 0 for missing/cutoff counts but require at least 1 in one of the two | 2026-02-25 | b0edabc | [1-allow-0-for-missing-cutoff-counts-but-re](./quick/1-allow-0-for-missing-cutoff-counts-but-re/) |
 
 ## Session Continuity
 

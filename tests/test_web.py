@@ -244,6 +244,62 @@ def test_save_settings_replaces_api_key_when_provided(client, test_app, tmp_path
     assert "test-radarr-key" not in content, "Old radarr key should be replaced"
 
 
+def test_save_settings_rejects_both_zero_counts(client, test_app, tmp_path):
+    """POST /settings with both counts=0 for enabled app redirects without writing config."""
+    response = client.post(
+        "/settings",
+        data={
+            "log_level": "info",
+            "hard_max_per_cycle": "0",
+            "radarr_url": "http://radarr:7878",
+            "radarr_api_key": "test-key",
+            "radarr_enabled": "on",
+            "radarr_search_interval": "30",
+            "radarr_search_missing_count": "0",
+            "radarr_search_cutoff_count": "0",
+            "sonarr_url": "",
+            "sonarr_api_key": "",
+            "sonarr_search_interval": "30",
+            "sonarr_search_missing_count": "5",
+            "sonarr_search_cutoff_count": "5",
+        },
+        follow_redirects=False,
+    )
+    assert response.status_code == 303, f"Expected 303 redirect, got {response.status_code}"
+    assert response.headers["location"] == "/settings"
+    # Config file should NOT have been written (validation rejected the request)
+    assert not test_app.state.config_path.exists(), "Config should not be written when both counts are 0"
+
+
+def test_save_settings_accepts_zero_missing_with_positive_cutoff(client, test_app, tmp_path):
+    """POST /settings with missing=0, cutoff=5 for enabled app writes config successfully."""
+    response = client.post(
+        "/settings",
+        data={
+            "log_level": "info",
+            "hard_max_per_cycle": "0",
+            "radarr_url": "http://radarr:7878",
+            "radarr_api_key": "test-key",
+            "radarr_enabled": "on",
+            "radarr_search_interval": "30",
+            "radarr_search_missing_count": "0",
+            "radarr_search_cutoff_count": "5",
+            "sonarr_url": "",
+            "sonarr_api_key": "",
+            "sonarr_search_interval": "30",
+            "sonarr_search_missing_count": "5",
+            "sonarr_search_cutoff_count": "5",
+        },
+        follow_redirects=False,
+    )
+    assert response.status_code == 303, f"Expected 303 redirect, got {response.status_code}"
+    assert response.headers["location"] == "/settings"
+    # Config file SHOULD have been written (0 missing is valid when cutoff > 0)
+    assert test_app.state.config_path.exists(), "Config should be written when one count is positive"
+    content = test_app.state.config_path.read_text()
+    assert "radarr" in content, "TOML should contain radarr section"
+
+
 def test_search_now_invalid_app(client):
     """POST /api/search-now/invalid returns 400."""
     response = client.post("/api/search-now/invalid")

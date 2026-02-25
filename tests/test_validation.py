@@ -109,10 +109,13 @@ class TestSafeInt:
         assert safe_int("abc", default=5, minimum=1, maximum=1440) == 5
 
     def test_below_minimum_clamped(self) -> None:
-        assert safe_int("0", default=5, minimum=1, maximum=1440) == 1
+        assert safe_int("0", default=5, minimum=0, maximum=1440) == 0
 
     def test_above_maximum_clamped(self) -> None:
         assert safe_int("9999", default=5, minimum=1, maximum=1440) == 1440
+
+    def test_negative_clamped_to_zero(self) -> None:
+        assert safe_int("-5", default=5, minimum=0, maximum=100) == 0
 
     def test_negative_below_minimum_clamped(self) -> None:
         assert safe_int("-5", default=5, minimum=1, maximum=100) == 1
